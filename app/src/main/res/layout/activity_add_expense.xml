@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -16,11 +17,9 @@
             android:id="@+id/btnBack"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_home"
-            android:rotation="180"
+            android:src="@drawable/ic_arrow_back"
             android:contentDescription="Back"
-            android:app:tint="#333333"
-            xmlns:app="http://schemas.android.com/apk/res-auto"/>
+            app:tint="#333333"/>
 
         <TextView
             android:layout_width="0dp"
@@ -79,7 +78,7 @@
                     android:inputType="numberDecimal"
                     android:textSize="28sp"
                     android:textStyle="bold"
-                    android:textColor="@color/black"
+                    android:textColor="#333333"
                     android:textColorHint="#999999"/>
             </LinearLayout>
 
@@ -100,7 +99,7 @@
                 <Spinner
                     android:id="@+id/spinnerCategory"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent" />
             </LinearLayout>
 
             <TextView
@@ -119,7 +118,7 @@
                 android:gravity="top|start"
                 android:padding="16dp"
                 android:textSize="14sp"
-                android:textColor="@color/black"
+                android:textColor="#333333"
                 android:textColorHint="#999999"
                 android:layout_marginBottom="24dp"/>
 
@@ -164,7 +163,6 @@
             android:textStyle="bold"
             android:textColor="@android:color/white"
             android:background="@drawable/bg_input_field"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             app:backgroundTint="@color/finwise_green"/>
     </LinearLayout>
 
