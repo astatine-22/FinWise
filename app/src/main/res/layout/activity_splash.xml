@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/splash_background"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        app:cardCornerRadius="60dp"
+        app:cardBackgroundColor="@color/logo_circle_bg"
+        app:cardElevation="0dp"
+        android:layout_marginBottom="24dp">
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:src="@android:drawable/ic_lock_idle_lock"
+            app:tint="#4A6558" />
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FinWise"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="32sp"
+        android:textColor="@color/text_title"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Learn Money. Grow Smart."
+        android:fontFamily="sans-serif"
+        android:textSize="16sp"
+        android:textColor="@color/text_subtitle"
+        android:letterSpacing="0.02"/>
+
+</LinearLayout>

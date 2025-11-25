@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="finwise_green">#9ED9C5</color>
+
+    <color name="splash_background">#F8F9FA</color>
+    <color name="logo_circle_bg">#E6F4F1</color>
+    <color name="text_title">#2D2D2D</color>
+    <color name="text_subtitle">#757575</color>
+
+    <color name="card_budget_bg">#E8F5E9</color>   <color name="card_learn_bg">#FFF3E0</color>     <color name="card_goals_bg">#F3E5F5</color>     <color name="card_trading_bg">#E3F2FD</color>   <color name="progress_budget">#66BB6A</color>
+    <color name="progress_goals">#AB47BC</color>
+    <color name="text_gain_green">#2E7D32</color>
+
+    <color name="cat_food">#FF9800</color>
+    <color name="cat_shopping">#9C27B0</color>
+    <color name="cat_transport">#03A9F4</color>
+    <color name="cat_entertainment">#009688</color>
+</resources>
