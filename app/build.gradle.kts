@@ -52,4 +52,10 @@ dependencies {
     // UI Tools
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+
+    // Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+
+    // MPAndroidChart Library for the Pie Chart
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }

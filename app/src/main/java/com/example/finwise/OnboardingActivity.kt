@@ -1,111 +1,143 @@
 package com.example.finwise
 
+import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.widget.Button
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.button.MaterialButton
 
 class OnboardingActivity : AppCompatActivity() {
 
-    private lateinit var viewPager: ViewPager2
-    private lateinit var btnNext: Button
-    private lateinit var tvSkip: TextView
-    private lateinit var dots: List<ImageView>
+    private lateinit var onboardingAdapter: OnboardingAdapter
+    private lateinit var indicatorsContainer: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // KEEP THIS CHECK: If they logged out previously, they shouldn't see this again.
+        val sharedPref = getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
+        val isOnboardingDone = sharedPref.getBoolean("COMPLETED_ONBOARDING", false)
+
+        if (isOnboardingDone) {
+            navigateToLogin()
+            return
+        }
+
         setContentView(R.layout.activity_onboarding)
 
-        // Initialize views
-        viewPager = findViewById(R.id.viewPager)
-        btnNext = findViewById(R.id.btnNext)
-        tvSkip = findViewById(R.id.tvSkip)
+        // Initialize Views
+        val viewPager = findViewById<ViewPager2>(R.id.viewPagerOnboarding)
+        indicatorsContainer = findViewById(R.id.layoutOnboardingIndicators)
+        val btnAction = findViewById<MaterialButton>(R.id.btnAction)
+        val tvSkip = findViewById<TextView>(R.id.tvSkip)
 
-        // Setup Dots indicators
-        dots = listOf(
-            findViewById(R.id.dot1),
-            findViewById(R.id.dot2),
-            findViewById(R.id.dot3)
-        )
-
-        // 1. Prepare Data using your real images
-        val slides = listOf(
-            OnboardingItem(
-                R.drawable.onboarding_1, // The Plant Image
-                "Master Your Money Early",
-                "Gain financial confidence and build smart habits for your future."
-            ),
-            OnboardingItem(
-                R.drawable.onboarding_2, // The Pie Chart Image
-                "Track Spending Effortlessly",
-                "See where your money goes and make smarter decisions."
-            ),
-            OnboardingItem(
-                R.drawable.onboarding_3, // The Graph Image
-                "Practice Investing With No Risk",
-                "Experience the market with virtual money before you invest for real."
+        // Data for the slides
+        onboardingAdapter = OnboardingAdapter(
+            listOf(
+                OnboardingItem(
+                    R.drawable.onboarding_1,
+                    "Track Your Spending",
+                    "Effortlessly track income and expenses to see exactly where your money goes."
+                ),
+                OnboardingItem(
+                    R.drawable.onboarding_2,
+                    "Learn & Grow",
+                    "Master financial concepts with bite-sized lessons and interactive quizzes."
+                ),
+                OnboardingItem(
+                    R.drawable.onboarding_3,
+                    "Achieve Goals",
+                    "Set savings targets, build better habits, and watch your wealth grow."
+                )
             )
         )
 
-        // 2. Set Adapter
-        val adapter = OnboardingAdapter(slides)
-        viewPager.adapter = adapter
+        viewPager.adapter = onboardingAdapter
 
-        // 3. Handle Swipe Changes (Update Dots & Button Text)
+        setupIndicators()
+        setCurrentIndicator(0)
+
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                updateDots(position)
+                setCurrentIndicator(position)
 
-                // Change button text on the last slide
-                if (position == slides.size - 1) {
-                    btnNext.text = "Get Started"
+                if (position == onboardingAdapter.itemCount - 1) {
+                    btnAction.text = "Get Started"
                 } else {
-                    btnNext.text = "Next"
+                    btnAction.text = "Next"
                 }
             }
         })
 
-        // 4. Button Actions
-        btnNext.setOnClickListener {
-            val currentItem = viewPager.currentItem
-            if (currentItem < slides.size - 1) {
-                // Move to next slide
-                viewPager.setCurrentItem(currentItem + 1, true)
+        // --- SKIP BUTTON ACTION ---
+        tvSkip.setOnClickListener {
+            // Just go to login, don't save status yet
+            navigateToLogin()
+        }
+
+        // --- MAIN BUTTON ACTION ---
+        btnAction.setOnClickListener {
+            if (viewPager.currentItem + 1 < onboardingAdapter.itemCount) {
+                viewPager.currentItem += 1
             } else {
-                // Last slide? Go to Login
-                finishOnboarding()
+                // Just go to login, don't save status yet
+                navigateToLogin()
             }
         }
-
-        tvSkip.setOnClickListener {
-            finishOnboarding()
-        }
-
-        // Initialize dots state at start
-        updateDots(0)
     }
 
-    // Helper function to change dot colors
-    private fun updateDots(activePosition: Int) {
-        // Using the FinWise green color
-        val activeColor = Color.parseColor("#9ED9C5")
-        val inactiveColor = Color.LTGRAY
+    private fun navigateToLogin() {
+        startActivity(Intent(this, LoginActivity::class.java))
+        finish()
+    }
 
-        dots.forEachIndexed { index, imageView ->
-            imageView.setColorFilter(if (index == activePosition) activeColor else inactiveColor)
+    private fun setupIndicators() {
+        val indicators = arrayOfNulls<ImageView>(onboardingAdapter.itemCount)
+        val layoutParams: LinearLayout.LayoutParams =
+            LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+        layoutParams.setMargins(8, 0, 8, 0)
+
+        for (i in indicators.indices) {
+            indicators[i] = ImageView(applicationContext)
+            indicators[i]?.let {
+                it.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        applicationContext,
+                        R.drawable.indicator_inactive
+                    )
+                )
+                it.layoutParams = layoutParams
+                indicatorsContainer.addView(it)
+            }
         }
     }
 
-    // Helper function to move to the Login Screen
-    private fun finishOnboarding() {
-        // Navigate to LOGIN ACTIVITY
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
-        finish() // Close onboarding
+    private fun setCurrentIndicator(index: Int) {
+        val childCount = indicatorsContainer.childCount
+        for (i in 0 until childCount) {
+            val imageView = indicatorsContainer.getChildAt(i) as ImageView
+            if (i == index) {
+                imageView.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        applicationContext,
+                        R.drawable.indicator_active
+                    )
+                )
+            } else {
+                imageView.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        applicationContext,
+                        R.drawable.indicator_inactive
+                    )
+                )
+            }
+        }
     }
 }

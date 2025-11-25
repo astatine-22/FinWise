@@ -1,46 +1,63 @@
 package com.example.finwise
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.finwise.api.ExpenseItem  // <--- IMPORT THIS!
+import com.example.finwise.api.ExpenseResponse
+import java.text.NumberFormat
+import java.util.Locale
 
-// NOTE: We deleted the "data class ExpenseItem" from here because
-// we are using the one defined in ApiService.kt now.
-
-class ExpenseAdapter(private val expenses: List<ExpenseItem>) :
+class ExpenseAdapter(private var expenses: List<ExpenseResponse>) :
     RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder>() {
 
     class ExpenseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val title: TextView = view.findViewById(R.id.tvTitle)
-        val date: TextView = view.findViewById(R.id.tvDate)
-        val amount: TextView = view.findViewById(R.id.tvAmount)
-        val icon: ImageView = view.findViewById(R.id.imgCategory)
+        val ivIcon: ImageView = view.findViewById(R.id.ivExpenseIcon)
+        val tvTitle: TextView = view.findViewById(R.id.tvExpenseTitle)
+        val tvDate: TextView = view.findViewById(R.id.tvExpenseDate)
+        val tvAmount: TextView = view.findViewById(R.id.tvExpenseAmount)
+        val iconBackground: View = view.findViewById(R.id.iconBackground)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExpenseViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_expense, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_expense, parent, false)
         return ExpenseViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ExpenseViewHolder, position: Int) {
-        val item = expenses[position]
+        val expense = expenses[position]
 
-        holder.title.text = item.title
-        holder.date.text = item.date
-        holder.amount.text = "- ₹${item.amount}"
+        holder.tvTitle.text = expense.title
+        holder.tvDate.text = expense.date
 
-        // Set Icon based on category
-        when (item.category) {
-            "Food" -> holder.icon.setImageResource(R.drawable.ic_food)
-            "Shopping" -> holder.icon.setImageResource(R.drawable.ic_shopping)
-            "Transport" -> holder.icon.setImageResource(R.drawable.ic_transport)
-            else -> holder.icon.setImageResource(R.drawable.ic_entertainment)
+        // Format amount to Rupee currency
+        val rupeeFormat = NumberFormat.getCurrencyInstance(Locale("en", "IN"))
+        holder.tvAmount.text = "-${rupeeFormat.format(expense.amount)}"
+
+        // Set icon and color based on category
+        val (iconRes, colorHex) = when (expense.category) {
+            "Food" -> Pair(R.drawable.ic_food, "#FFB74D") // Orange
+            "Shopping" -> Pair(R.drawable.ic_shopping, "#CE93D8") // Purple
+            "Transport" -> Pair(R.drawable.ic_transport, "#4FC3F7") // Light Blue
+            "Entertainment" -> Pair(R.drawable.ic_entertainment, "#80CBC4") // Teal
+            "Utilities" -> Pair(R.drawable.ic_utilities, "#E57373") // Red
+            else -> Pair(R.drawable.ic_other, "#FFF176") // Yellow (Other)
         }
+
+        holder.ivIcon.setImageResource(iconRes)
+        holder.iconBackground.background.setTint(Color.parseColor(colorHex))
     }
 
     override fun getItemCount() = expenses.size
+
+    // --- THIS IS THE FUNCTION THAT WAS MISSING ---
+    // It updates the data list and refreshes the RecyclerView
+    fun updateData(newExpenses: List<ExpenseResponse>) {
+        this.expenses = newExpenses
+        notifyDataSetChanged()
+    }
 }
