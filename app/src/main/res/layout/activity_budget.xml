@@ -149,7 +149,7 @@
                     app:cardCornerRadius="20dp"
                     app:cardBackgroundColor="#FFFFFF"
                     app:cardElevation="0dp"
-                    android:layout_marginBottom="24dp">
+                    android:layout_marginBottom="16dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -160,12 +160,25 @@
 
                         <com.github.mikephil.charting.charts.PieChart
                             android:id="@+id/pieChart"
-                            android:layout_width="220dp"
-                            android:layout_height="220dp"
-                            android:layout_marginBottom="16dp"/>
+                            android:layout_width="240dp"
+                            android:layout_height="240dp"/>
 
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnViewBreakdown"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="View Full Breakdown"
+                    android:textColor="@color/finwise_green"
+                    android:textStyle="bold"
+                    app:backgroundTint="#E0F2F1"
+                    app:cornerRadius="12dp"
+                    android:layout_marginBottom="24dp"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
