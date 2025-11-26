@@ -34,8 +34,8 @@ class ExpenseAdapter(private var expenses: List<ExpenseResponse>) :
         holder.tvTitle.text = expense.title
         holder.tvDate.text = expense.date
 
-        // Format amount to Rupee currency
-        val rupeeFormat = NumberFormat.getCurrencyInstance(Locale("en", "IN"))
+        // --- FIX: Use forLanguageTag for modern Android ---
+        val rupeeFormat = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("en-IN"))
         holder.tvAmount.text = "-${rupeeFormat.format(expense.amount)}"
 
         // Set icon and color based on category
@@ -52,10 +52,9 @@ class ExpenseAdapter(private var expenses: List<ExpenseResponse>) :
         holder.iconBackground.background.setTint(Color.parseColor(colorHex))
     }
 
+    // This must be correct for the list to show all items
     override fun getItemCount() = expenses.size
 
-    // --- THIS IS THE FUNCTION THAT WAS MISSING ---
-    // It updates the data list and refreshes the RecyclerView
     fun updateData(newExpenses: List<ExpenseResponse>) {
         this.expenses = newExpenses
         notifyDataSetChanged()

@@ -1,34 +1,35 @@
 package com.example.finwise
 
-import android.graphics.Color
+import android.app.DatePickerDialog
 import android.os.Bundle
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.Spinner
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import com.example.finwise.api.ExpenseCreateRequest
 import com.example.finwise.api.RetrofitClient
+import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class AddExpenseActivity : AppCompatActivity() {
 
-    private lateinit var etAmount: EditText
+    private lateinit var etAmount: TextInputEditText
     private lateinit var spinnerCategory: Spinner
-    private lateinit var etNote: EditText
+    private lateinit var etNote: TextInputEditText
+    private lateinit var etDate: TextInputEditText
     private lateinit var btnSave: AppCompatButton
-    private lateinit var btnBack: ImageView
+    private lateinit var btnBack: android.widget.ImageView
     private var userEmail: String? = null
 
-    // Categories matching our icon set
+    private val selectedCalendar = Calendar.getInstance()
+
     private val categories = listOf(
         "Food", "Shopping", "Transport", "Entertainment", "Utilities", "Other"
     )
@@ -41,13 +42,14 @@ class AddExpenseActivity : AppCompatActivity() {
         etAmount = findViewById(R.id.etAmount)
         spinnerCategory = findViewById(R.id.spinnerCategory)
         etNote = findViewById(R.id.etNote)
+        etDate = findViewById(R.id.etDate)
         btnSave = findViewById(R.id.btnSave)
         btnBack = findViewById(R.id.btnBack)
 
-        // Get Email passed from BudgetActivity
         userEmail = intent.getStringExtra("USER_EMAIL")
 
         setupCategorySpinner()
+        setupDatePicker()
 
         // Listeners
         btnBack.setOnClickListener { finish() }
@@ -55,41 +57,52 @@ class AddExpenseActivity : AppCompatActivity() {
     }
 
     private fun setupCategorySpinner() {
-        val adapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories) {
-            override fun isEnabled(position: Int): Boolean {
-                return true
-            }
-
-            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getDropDownView(position, convertView, parent)
-                val tv = view as TextView
-                tv.setTextColor(Color.BLACK)
-                return view
-            }
-        }
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val adapter = ArrayAdapter(this, R.layout.spinner_item, categories)
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
         spinnerCategory.adapter = adapter
+    }
+
+    private fun setupDatePicker() {
+        updateDateLabel()
+
+        etDate.setOnClickListener {
+            // Pass the custom theme here as the second argument
+            DatePickerDialog(
+                this,
+                R.style.Theme_FinWise_DatePickerDialog,
+                { _, year, month, dayOfMonth ->
+                    selectedCalendar.set(Calendar.YEAR, year)
+                    selectedCalendar.set(Calendar.MONTH, month)
+                    selectedCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    updateDateLabel()
+                },
+                selectedCalendar.get(Calendar.YEAR),
+                selectedCalendar.get(Calendar.MONTH),
+                selectedCalendar.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
+    }
+
+    private fun updateDateLabel() {
+        val displayFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+        etDate.setText(displayFormat.format(selectedCalendar.time))
     }
 
     private fun saveExpense() {
         val amountStr = etAmount.text.toString().trim()
         val category = categories[spinnerCategory.selectedItemPosition]
-        // Note is optional, use title case category as default title if empty
         val title = etNote.text.toString().trim().ifEmpty { category }
 
-        // Basic Validation
         if (amountStr.isEmpty()) {
             Toast.makeText(this, "Please enter an amount", Toast.LENGTH_SHORT).show()
             return
         }
         if (userEmail == null) {
-            Toast.makeText(this, "User email not found, please login again.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "User email not found", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // --- THE FIX IS HERE ---
-        // We must convert the string to a Float, not a Double.
         val amountValue: Float
         try {
             amountValue = amountStr.toFloat()
@@ -98,31 +111,30 @@ class AddExpenseActivity : AppCompatActivity() {
             return
         }
 
-        // Create API Request Object
+        val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+        val dateStringForBackend = isoFormat.format(selectedCalendar.time)
+
         val request = ExpenseCreateRequest(
             title = title,
             amount = amountValue,
             category = category,
-            email = userEmail!!
+            email = userEmail!!,
+            date = dateStringForBackend
         )
 
-        // Disable button to prevent double-clicks
         btnSave.isEnabled = false
         btnSave.text = "Saving..."
 
-        // Call API
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = RetrofitClient.instance.addExpense(request)
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@AddExpenseActivity, response.message, Toast.LENGTH_SHORT).show()
-                    // Close activity and go back to budget screen
                     finish()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@AddExpenseActivity, "Failed to save: ${e.message}", Toast.LENGTH_SHORT).show()
-                    // Re-enable button on failure
                     btnSave.isEnabled = true
                     btnSave.text = "Save Expense"
                 }

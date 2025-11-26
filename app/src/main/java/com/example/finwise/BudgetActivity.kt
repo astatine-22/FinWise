@@ -21,6 +21,7 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.ChipGroup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,13 +37,15 @@ class BudgetActivity : AppCompatActivity(), OnChartValueSelectedListener {
     private lateinit var rvExpenses: RecyclerView
     private lateinit var expenseAdapter: ExpenseAdapter
     private lateinit var pieChart: PieChart
-    // NEW: Button to open Bottom Sheet
     private lateinit var btnViewBreakdown: MaterialButton
+    private lateinit var chipGroupRange: ChipGroup
 
     private var totalSpentString: String = ""
-    // NEW: Store category data for the bottom sheet
+    // Holds data for the bottom sheet
     private var currentCategoryList: List<CategorySummaryResponse> = emptyList()
     private var totalSpentAmount: Float = 0f
+    // Default date range is 1 month
+    private var currentRange: String = "1m"
 
     // Define the specific pastel colors from your design
     private val chartColors: List<Int> = listOf(
@@ -65,11 +68,13 @@ class BudgetActivity : AppCompatActivity(), OnChartValueSelectedListener {
         rvExpenses = findViewById(R.id.rvExpenses)
         pieChart = findViewById(R.id.pieChart)
         btnViewBreakdown = findViewById(R.id.btnViewBreakdown)
+        chipGroupRange = findViewById(R.id.chipGroupRange)
         val btnBack = findViewById<ImageView>(R.id.btnBack)
         val fabAdd = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabAdd)
 
         setupRecyclerView()
-        setupPieChartStyle() // Configure chart looks
+        setupPieChartStyle()
+        setupRangeChips()
 
         val userEmail = intent.getStringExtra("USER_EMAIL") ?: return
 
@@ -81,7 +86,6 @@ class BudgetActivity : AppCompatActivity(), OnChartValueSelectedListener {
             startActivity(intent)
         }
 
-        // NEW: Bottom Sheet Button Click Listener
         btnViewBreakdown.setOnClickListener {
             showBottomSheetBreakdown()
         }
@@ -89,13 +93,39 @@ class BudgetActivity : AppCompatActivity(), OnChartValueSelectedListener {
 
     override fun onResume() {
         super.onResume()
+        // Load data using whatever range is currently selected
+        loadBudgetData()
+    }
+
+    // --- Helper to load all data based on current range ---
+    private fun loadBudgetData() {
         val userEmail = intent.getStringExtra("USER_EMAIL")
         if (userEmail != null) {
-            fetchBudgetSummary(userEmail)
-            fetchExpenses(userEmail)
-            fetchCategorySummary(userEmail) // Fetch chart data
+            // Pass the currentRange variable to the API calls
+            fetchBudgetSummary(userEmail, currentRange)
+            fetchExpenses(userEmail, currentRange)
+            fetchCategorySummary(userEmail, currentRange)
         }
     }
+
+    // --- Setup Chip Listeners ---
+    private fun setupRangeChips() {
+        chipGroupRange.setOnCheckedChangeListener { _, checkedId ->
+            // Determine range string based on which chip ID is checked
+            currentRange = when (checkedId) {
+                R.id.chipToday -> "today"
+                R.id.chip7d -> "7d"
+                R.id.chip1m -> "1m"
+                R.id.chip6m -> "6m"
+                R.id.chip1y -> "1y"
+                R.id.chipAll -> "all"
+                else -> "1m" // Default fallback
+            }
+            // Reload all data with the new range
+            loadBudgetData()
+        }
+    }
+
 
     private fun setupRecyclerView() {
         expenseAdapter = ExpenseAdapter(emptyList())
@@ -108,17 +138,12 @@ class BudgetActivity : AppCompatActivity(), OnChartValueSelectedListener {
         pieChart.apply {
             description.isEnabled = false
             setOnChartValueSelectedListener(this@BudgetActivity)
-
-            // NEW: Disable the built-in legend completely
-            legend.isEnabled = false
-
-            // Donut chart styling
+            legend.isEnabled = false // Hide default legend
             isDrawHoleEnabled = true
             setHoleColor(Color.WHITE)
             holeRadius = 70f
             transparentCircleRadius = 75f
-
-            setDrawEntryLabels(false) // Hide labels on slices
+            setDrawEntryLabels(false)
             contentDescription = "Spending by category pie chart"
             setNoDataText("Loading chart...")
         }
@@ -127,20 +152,22 @@ class BudgetActivity : AppCompatActivity(), OnChartValueSelectedListener {
     // --- Handle Chart Clicks ---
     override fun onValueSelected(e: Entry?, h: Highlight?) {
         if (e is PieEntry) {
+            // Show selected category and amount in center
             pieChart.centerText = "${e.label}\n(Selected)"
         }
     }
 
     override fun onNothingSelected() {
+        // Reset to total when deselected
         pieChart.centerText = "Total Spent\n$totalSpentString"
     }
     // -------------------------------------------
 
 
-    // --- NEW: Function to show Bottom Sheet ---
+    // --- Function to show Bottom Sheet ---
     private fun showBottomSheetBreakdown() {
         if (currentCategoryList.isEmpty() || totalSpentAmount == 0f) {
-            Toast.makeText(this, "No data to display", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "No data to display for this period", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -151,16 +178,14 @@ class BudgetActivity : AppCompatActivity(), OnChartValueSelectedListener {
         val rvBreakdown = view.findViewById<RecyclerView>(R.id.rvBreakdown)
         rvBreakdown.layoutManager = LinearLayoutManager(this)
 
-        // Prepare data for adapter
         val breakdownItems = ArrayList<BreakdownItem>()
         var colorIndex = 0
         for (item in currentCategoryList) {
             if (item.total_amount > 0) {
-                // Calculate percentage
+                // Calculate percentage for the sheet
                 val percentage = ((item.total_amount / totalSpentAmount) * 100).toInt()
-                // Assign color cyclically
+                // Assign colors cyclically
                 val color = chartColors[colorIndex % chartColors.size]
-
                 breakdownItems.add(BreakdownItem(item.category, item.total_amount, color, percentage))
                 colorIndex++
             }
@@ -174,16 +199,15 @@ class BudgetActivity : AppCompatActivity(), OnChartValueSelectedListener {
     // ------------------------------------------
 
 
-    // --- API CALLS ---
+    // --- API CALLS (Accepting range) ---
 
-    private fun fetchBudgetSummary(email: String) {
+    private fun fetchBudgetSummary(email: String, range: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val summary = RetrofitClient.instance.getBudgetSummary(email)
+                val summary = RetrofitClient.instance.getBudgetSummary(email, range)
                 withContext(Dispatchers.Main) {
                     val rupeeFormat = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("en-IN"))
 
-                    // Store total amount for percentage calculations
                     totalSpentAmount = summary.total_spent
                     totalSpentString = rupeeFormat.format(summary.total_spent)
 
@@ -202,40 +226,46 @@ class BudgetActivity : AppCompatActivity(), OnChartValueSelectedListener {
                     pieChart.centerText = "Total Spent\n$totalSpentString"
                     pieChart.setCenterTextSize(16f)
                     pieChart.setCenterTextColor(Color.parseColor("#333333"))
+                    // Ensure chart text resets when range changes
+                    pieChart.highlightValues(null)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@BudgetActivity, "Error loading budget", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@BudgetActivity, "Error loading budget summary", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
-    private fun fetchExpenses(email: String) {
+    private fun fetchExpenses(email: String, range: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val expensesList = RetrofitClient.instance.getExpenses(email)
+                val expensesList = RetrofitClient.instance.getExpenses(email, range)
                 withContext(Dispatchers.Main) {
+                    // Toast debug message removed from here
                     expenseAdapter.updateData(expensesList)
                 }
             } catch (e: Exception) {
-                // Handle error quietly
+                withContext(Dispatchers.Main) {
+                    expenseAdapter.updateData(emptyList())
+                }
             }
         }
     }
 
-    private fun fetchCategorySummary(email: String) {
+    private fun fetchCategorySummary(email: String, range: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val categoryList = RetrofitClient.instance.getCategorySummary(email)
+                val categoryList = RetrofitClient.instance.getCategorySummary(email, range)
                 withContext(Dispatchers.Main) {
-                    // Store data for bottom sheet
                     currentCategoryList = categoryList
                     updatePieChartData(categoryList)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    pieChart.setNoDataText("Could not load chart data.")
+                    pieChart.setNoDataText("No chart data for this period.")
+                    currentCategoryList = emptyList()
+                    pieChart.data = null
                     pieChart.invalidate()
                 }
             }
@@ -248,10 +278,17 @@ class BudgetActivity : AppCompatActivity(), OnChartValueSelectedListener {
         for (item in categoryList) {
             if (item.total_amount > 0) {
                 val rupeeFormat = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("en-IN"))
-                // Label for chart slice click
+                // Label combined with amount for chart slice click interaction
                 val label = "${item.category}\n${rupeeFormat.format(item.total_amount)}"
                 entries.add(PieEntry(item.total_amount.toFloat(), label))
             }
+        }
+
+        if (entries.isEmpty()) {
+            pieChart.data = null
+            pieChart.centerText = "No Spending\nFor this period"
+            pieChart.invalidate()
+            return
         }
 
         val dataSet = PieDataSet(entries, "")
@@ -263,8 +300,8 @@ class BudgetActivity : AppCompatActivity(), OnChartValueSelectedListener {
         val data = PieData(dataSet)
         pieChart.data = data
         pieChart.centerText = "Total Spent\n$totalSpentString"
-        pieChart.highlightValues(null) // Clear previous selection
+        pieChart.highlightValues(null)
         pieChart.invalidate()
-        pieChart.animateY(1000)
+        pieChart.animateY(500) // Faster animation when switching ranges
     }
 }

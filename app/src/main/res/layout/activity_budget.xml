@@ -38,17 +38,13 @@
                 android:textColor="#333333"
                 android:gravity="center"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="This Month"
-                android:textColor="#999999"
-                android:textSize="14sp"/>
+            <View android:layout_width="24dp" android:layout_height="24dp"/>
         </LinearLayout>
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:fillViewport="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -62,7 +58,7 @@
                     app:cardCornerRadius="20dp"
                     app:cardBackgroundColor="#FFFFFF"
                     app:cardElevation="0dp"
-                    android:layout_marginBottom="24dp">
+                    android:layout_marginBottom="16dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -83,13 +79,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Total Monthly"
-                                    android:textSize="14sp"
-                                    android:textColor="#757575"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Spending"
+                                    android:text="Total Spending"
                                     android:textSize="14sp"
                                     android:textColor="#757575"/>
                             </LinearLayout>
@@ -102,16 +92,6 @@
                                 android:textStyle="bold"
                                 android:textSize="20sp"
                                 android:textColor="#333333"/>
-
-                            <TextView
-                                android:id="@+id/tvBudgetLimit"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text=" / ₹20,000"
-                                android:textSize="14sp"
-                                android:textColor="#999999"
-                                android:layout_gravity="bottom"
-                                android:layout_marginBottom="4dp"/>
                         </LinearLayout>
 
                         <ProgressBar
@@ -127,12 +107,96 @@
                             android:id="@+id/tvRemaining"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="₹20,000 left to spend"
+                            android:text="Calculating..."
                             android:textSize="12sp"
                             android:textColor="#757575"
                             android:layout_marginTop="8dp"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:layout_marginBottom="24dp">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroupRange"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:singleSelection="true"
+                        app:selectionRequired="true">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipToday"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Today"
+                            android:textColor="@color/chip_text_selector"
+                            app:chipBackgroundColor="@color/white"
+                            app:chipStrokeColor="#E0E0E0"
+                            app:chipStrokeWidth="1dp"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip7d"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="7 Days"
+                            android:textColor="@color/chip_text_selector"
+                            app:chipBackgroundColor="@color/white"
+                            app:chipStrokeColor="#E0E0E0"
+                            app:chipStrokeWidth="1dp"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip1m"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1 Month"
+                            android:checked="true"
+                            android:textColor="@color/chip_text_selector"
+                            app:chipBackgroundColor="@color/white"
+                            app:chipStrokeColor="#E0E0E0"
+                            app:chipStrokeWidth="1dp"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip6m"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="6 Months"
+                            android:textColor="@color/chip_text_selector"
+                            app:chipBackgroundColor="@color/white"
+                            app:chipStrokeColor="#E0E0E0"
+                            app:chipStrokeWidth="1dp"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip1y"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1 Year"
+                            android:textColor="@color/chip_text_selector"
+                            app:chipBackgroundColor="@color/white"
+                            app:chipStrokeColor="#E0E0E0"
+                            app:chipStrokeWidth="1dp"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipAll"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="All Time"
+                            android:textColor="@color/chip_text_selector"
+                            app:chipBackgroundColor="@color/white"
+                            app:chipStrokeColor="#E0E0E0"
+                            app:chipStrokeWidth="1dp"/>
+
+                    </com.google.android.material.chip.ChipGroup>
+                </HorizontalScrollView>
+
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -182,7 +246,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Recent Expenses"
+                    android:text="Your expenses"
                     android:textStyle="bold"
                     android:textSize="18sp"
                     android:textColor="#333333"
@@ -192,12 +256,13 @@
                     android:id="@+id/rvExpenses"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"/>
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"/>
 
                 <View android:layout_width="match_parent" android:layout_height="80dp"/>
 
             </LinearLayout>
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

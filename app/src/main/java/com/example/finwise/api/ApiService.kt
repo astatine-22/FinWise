@@ -6,6 +6,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 // --- Data Models ---
 
@@ -18,14 +19,23 @@ data class UserProfile(val name: String, val xp: Int)
 data class AuthResponse(val message: String, val user_id: Int?, val user: UserProfile?)
 
 // 2. Expense Models
-data class ExpenseCreateRequest(val title: String, val amount: Float, val category: String, val email: String)
+// UPDATED: Added optional 'date' field for sending selected date to backend
+data class ExpenseCreateRequest(
+    val title: String,
+    val amount: Float,
+    val category: String,
+    val email: String,
+    val date: String? = null // Optional ISO 8601 date string
+)
+
 data class SimpleResponse(val message: String)
+
 data class ExpenseResponse(
     val id: Int,
     val title: String,
     val amount: Float,
     val category: String,
-    val date: String
+    val date: String // Formatted date string from backend
 )
 
 // 3. Budget Models
@@ -62,22 +72,32 @@ interface ApiService {
     @POST("api/expenses")
     suspend fun addExpense(@Body request: ExpenseCreateRequest): SimpleResponse
 
+    // Get Expenses with Date Range Filter
     @GET("api/expenses/{email}")
-    suspend fun getExpenses(@Path("email") email: String): List<ExpenseResponse>
+    suspend fun getExpenses(
+        @Path("email") email: String,
+        @Query("range") range: String
+    ): List<ExpenseResponse>
 
-    // Budget Routes
+    // Budget Routes with Date Range Filter
     @GET("api/budget/summary/{email}")
-    suspend fun getBudgetSummary(@Path("email") email: String): BudgetSummaryResponse
+    suspend fun getBudgetSummary(
+        @Path("email") email: String,
+        @Query("range") range: String
+    ): BudgetSummaryResponse
 
-    // Pie Chart Data Route
+    // Pie Chart Data Route with Date Range Filter
     @GET("api/budget/categories/{email}")
-    suspend fun getCategorySummary(@Path("email") email: String): List<CategorySummaryResponse>
+    suspend fun getCategorySummary(
+        @Path("email") email: String,
+        @Query("range") range: String
+    ): List<CategorySummaryResponse>
 }
 
 
 // --- Retrofit Client (Singleton) ---
 object RetrofitClient {
-    // IMPORTANT: Updated with your physical phone's local network IP address.
+    // IMPORTANT: Use your computer's real local IP address here for physical devices.
     // Keep http:// at the start and :8000/ at the end.
     private const val BASE_URL = "http://172.18.0.149:8000/"
 
