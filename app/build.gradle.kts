@@ -58,4 +58,8 @@ dependencies {
 
     // MPAndroidChart Library for the Pie Chart
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+
+    implementation("androidx.activity:activity-ktx:1.7.2")
 }

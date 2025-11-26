@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
+    android:background="#F8F9FA"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:id="@+id/headerLayout"
@@ -99,9 +100,9 @@
                 <Spinner
                     android:id="@+id/spinnerCategory"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="6dp"
-                    android:spinnerMode="dropdown" />
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:spinnerMode="dropdown"/>
             </androidx.cardview.widget.CardView>
 
             <TextView

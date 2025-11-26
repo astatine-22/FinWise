@@ -14,263 +14,51 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="20dp"
+        android:background="#F8F9FA"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.cardview.widget.CardView
+        <ImageView
+            android:id="@+id/ivProfile"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="#263238">
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_person"
-                app:tint="@color/white"
-                android:padding="8dp"/>
-        </androidx.cardview.widget.CardView>
+            android:src="@drawable/ic_person"/>
 
-        <TextView
-            android:id="@+id/tvWelcome"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Welcome, User!"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_marginStart="12dp"/>
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome back,"
+                android:textColor="#757575"
+                android:textSize="14sp"/>
+            <TextView
+                android:id="@+id/tvUserNameHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Loading..."
+                android:textColor="#333333"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
 
         <ImageView
-            android:id="@+id/btnNotificationBell"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:id="@+id/ivNotification"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:src="@drawable/ic_notification"
-            app:tint="@color/black"/>
+            app:tint="#333333"/>
     </LinearLayout>
 
-    <ScrollView
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/headerLayout"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:baselineAligned="false"
-                android:layout_marginBottom="24dp">
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp"
-                    android:layout_marginEnd="8dp">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="12dp"
-                        android:background="@color/white">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="XP Points" android:textSize="12sp" android:textColor="#757575"/>
-                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
-                            <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_star" app:tint="#FFC107"/>
-                            <TextView android:id="@+id/tvXp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textStyle="bold" android:textSize="16sp" android:textColor="@color/black" android:layout_marginStart="4dp"/>
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp"
-                    android:layout_marginEnd="8dp">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="12dp"
-                        android:background="@color/white">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Badges" android:textSize="12sp" android:textColor="#757575"/>
-                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
-                            <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_badge" app:tint="#FF7043"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5" android:textStyle="bold" android:textSize="16sp" android:textColor="@color/black" android:layout_marginStart="4dp"/>
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="12dp"
-                        android:background="@color/white">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Daily Progress" android:textSize="12sp" android:textColor="#757575"/>
-                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
-                            <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_check_circle" app:tint="#4CAF50"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="75%" android:textStyle="bold" android:textSize="16sp" android:textColor="@color/black" android:layout_marginStart="4dp"/>
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-            </LinearLayout>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardBudget"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/card_budget_bg"
-                android:layout_marginBottom="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-                        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_wallet" app:tint="#2E7D32"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Budget Tracker" android:textStyle="bold" android:textSize="18sp" android:textColor="#1B5E20" android:layout_marginStart="12dp"/>
-                    </LinearLayout>
-
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="See where your money goes." android:textSize="14sp" android:textColor="#558B2F" android:layout_marginTop="4dp"/>
-
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="16dp">
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:text="Monthly Budget" android:textSize="12sp" android:textColor="#333333" android:layout_weight="1"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="75% Used" android:textStyle="bold" android:textSize="12sp" android:textColor="#333333"/>
-                    </LinearLayout>
-
-                    <ProgressBar
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="8dp"
-                        android:progress="75"
-                        android:progressTint="@color/progress_budget"
-                        android:layout_marginTop="8dp"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/card_learn_bg"
-                android:layout_marginBottom="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-                        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_school" app:tint="#E65100"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:text="Learn"
-                            android:textColor="#E65100"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Boost your financial IQ." android:textSize="14sp" android:textColor="#EF6C00" android:layout_marginTop="4dp"/>
-
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FFE0B2" android:layout_marginTop="12dp" android:layout_marginBottom="12dp"/>
-
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:text="Next Lesson: Investing Basics" android:textStyle="bold" android:textColor="#E65100" android:layout_weight="1"/>
-                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_eye" app:tint="#E65100"/>
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="#F3E5F5"
-                android:layout_marginBottom="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-                        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_nav_goals" app:tint="#8E24AA"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Savings Goals" android:textStyle="bold" android:textSize="18sp" android:textColor="#8E24AA" android:layout_marginStart="12dp"/>
-                    </LinearLayout>
-
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Get closer to your dreams." android:textSize="14sp" android:textColor="#BA68C8" android:layout_marginTop="4dp"/>
-
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="16dp">
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:text="New Car Fund" android:textSize="14sp" android:textColor="#8E24AA" android:layout_weight="1"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="₹1,500 / ₹5,000" android:textStyle="bold" android:textSize="14sp" android:textColor="#8E24AA"/>
-                    </LinearLayout>
-
-                    <ProgressBar
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="8dp"
-                        android:progress="30"
-                        android:progressTint="#8E24AA"
-                        android:progressBackgroundTint="#E1BEE7"
-                        android:layout_marginTop="8dp"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/card_trading_bg">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-                        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_chart" app:tint="#0D47A1"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Paper Trading" android:textStyle="bold" android:textSize="18sp" android:textColor="#0D47A1" android:layout_marginStart="12dp"/>
-                    </LinearLayout>
-
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Practice investing risk-free." android:textSize="14sp" android:textColor="#1565C0" android:layout_marginTop="4dp"/>
-
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="16dp">
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:text="Portfolio Performance" android:textSize="14sp" android:textColor="#333333" android:layout_weight="1"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="+₹50.25 today" android:textStyle="bold" android:textColor="@color/text_gain_green"/>
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-        </LinearLayout>
-    </ScrollView>
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
@@ -278,10 +66,22 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         app:menu="@menu/bottom_nav_menu"
-        app:itemIconTint="@color/nav_item_color_state"
-        app:itemTextColor="@color/nav_item_color_state"
         app:labelVisibilityMode="labeled"
-        android:elevation="8dp"
+        app:itemIconTint="@color/finwise_green"
+        app:itemTextColor="@color/finwise_green"
         app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabMainAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_add"
+        app:tint="@color/white"
+        app:backgroundTint="@color/finwise_green"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="Add Expense" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
