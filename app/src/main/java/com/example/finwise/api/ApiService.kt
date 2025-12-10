@@ -3,8 +3,10 @@ package com.example.finwise.api
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -52,6 +54,7 @@ data class CategorySummaryResponse(
 )
 
 
+
 // --- API Interface ---
 interface ApiService {
 
@@ -92,6 +95,21 @@ interface ApiService {
         @Path("email") email: String,
         @Query("range") range: String
     ): List<CategorySummaryResponse>
+
+
+    // To delete an expense, we need its unique ID
+    // We use the HTTP method DELETE
+    @DELETE("api/expenses/{id}") // Added api/ prefix to match other routes
+    suspend fun deleteExpense(@Path("id") expenseId: Int): SimpleResponse // Changed DeleteResponse to SimpleResponse
+
+
+
+    // To update an expense, we need its ID and the new data content
+    // We use the HTTP method PUT (or sometimes PATCH) to update
+    @PUT("api/expenses/{id}") // Added api/ prefix to match other routes
+    suspend fun updateExpense(@Path("id") expenseId: Int, @Body request: ExpenseCreateRequest): ExpenseResponse
+
+
 }
 
 

@@ -1,9 +1,7 @@
 package com.example.finwise
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
@@ -27,18 +25,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         userEmail = intent.getStringExtra("USER_EMAIL")
+
         tvUserNameHeader = findViewById(R.id.tvUserNameHeader)
         bottomNav = findViewById(R.id.bottomNavigationView)
         viewPager = findViewById(R.id.viewPager)
         val fabMainAdd = findViewById<FloatingActionButton>(R.id.fabMainAdd)
-        val ivNotification: ImageView = findViewById(R.id.ivNotification)
+        // Bell icon finding removed from here
 
         userEmail?.let { fetchHeaderInfo(it) }
 
         setupViewPager()
         setupBottomNavClicks()
         setupFabClick(fabMainAdd)
-        setupLogoutClick(ivNotification)
+        // Logout setup call removed from here
     }
 
     private fun setupViewPager() {
@@ -93,23 +92,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // --- THE FIX IS HERE ---
-    private fun setupLogoutClick(ivNotification: ImageView) {
-        ivNotification.setOnClickListener {
-            // 1. CLEAR SAVED DATA
-            val sharedPref = getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
-            sharedPref.edit().remove("LOGGED_IN_EMAIL").apply()
-
-            // 2. NAVIGATE TO LOGIN
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
-
-            Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show()
-        }
-    }
-    // -----------------------
+    // The setupLogoutClick function is completely removed from here.
 
     private fun fetchHeaderInfo(email: String) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -119,7 +102,7 @@ class MainActivity : AppCompatActivity() {
                     tvUserNameHeader.text = userProfile.name
                 }
             } catch (e: Exception) {
-                // Handle error silently for header
+                // Handle error silently
             }
         }
     }

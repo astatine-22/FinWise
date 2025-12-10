@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
@@ -17,6 +18,7 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.TimeZone
 
 class AddExpenseActivity : AppCompatActivity() {
 
@@ -26,34 +28,65 @@ class AddExpenseActivity : AppCompatActivity() {
     private lateinit var etDate: TextInputEditText
     private lateinit var btnSave: AppCompatButton
     private lateinit var btnBack: android.widget.ImageView
+    private lateinit var tvHeaderTitle: TextView // Header title TextView
     private var userEmail: String? = null
 
     private val selectedCalendar = Calendar.getInstance()
 
+    // Your existing category list
     private val categories = listOf(
-        "Food", "Shopping", "Transport", "Entertainment", "Utilities", "Other"
+        "Food", "Shopping", "Transport", "Entertainment", "Utilities", "Health", "Housing", "Other"
     )
+
+    // Variables for edit mode
+    private var isEditMode = false
+    private var expenseIdToEdit: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_expense)
 
-        // Initialize Views
+        initializeViews()
+        setupCategorySpinner()
+        setupDatePicker()
+
+        userEmail = intent.getStringExtra("USER_EMAIL")
+
+        // --- NEW: Check for EDIT Mode ---
+        val mode = intent.getStringExtra("MODE")
+        if (mode == "EDIT") {
+            isEditMode = true
+            expenseIdToEdit = intent.getIntExtra("EXPENSE_ID", -1)
+            val title = intent.getStringExtra("EXPENSE_TITLE")
+            val amount = intent.getFloatExtra("EXPENSE_AMOUNT", 0f)
+            val category = intent.getStringExtra("EXPENSE_CATEGORY")
+            val dateString = intent.getStringExtra("EXPENSE_DATE")
+
+            setupEditMode(title, amount, category, dateString)
+        }
+        // --------------------------------
+
+        // Listeners
+        btnBack.setOnClickListener { finish() }
+        btnSave.setOnClickListener { handleSaveButtonClick() }
+    }
+
+    private fun initializeViews() {
         etAmount = findViewById(R.id.etAmount)
         spinnerCategory = findViewById(R.id.spinnerCategory)
         etNote = findViewById(R.id.etNote)
         etDate = findViewById(R.id.etDate)
         btnSave = findViewById(R.id.btnSave)
         btnBack = findViewById(R.id.btnBack)
-
-        userEmail = intent.getStringExtra("USER_EMAIL")
-
-        setupCategorySpinner()
-        setupDatePicker()
-
-        // Listeners
-        btnBack.setOnClickListener { finish() }
-        btnSave.setOnClickListener { saveExpense() }
+        // Assuming you have a TextView with this ID in your layout for the header
+        // If not, you might need to add it or find the correct ID.
+        // Based on typical layouts, it's often named 'tvHeaderTitle' or similar.
+        // Let's try finding it, if it crashes, we can adjust the ID.
+        try {
+            tvHeaderTitle = findViewById(R.id.tvHeaderTitle)
+        } catch (e: Exception) {
+            // Handle case where ID might be different or missing
+        }
     }
 
     private fun setupCategorySpinner() {
@@ -63,10 +96,12 @@ class AddExpenseActivity : AppCompatActivity() {
     }
 
     private fun setupDatePicker() {
-        updateDateLabel()
+        // Only set default date if NOT in edit mode (edit mode sets its own date)
+        if (!isEditMode) {
+            updateDateLabel()
+        }
 
         etDate.setOnClickListener {
-            // Pass the custom theme here as the second argument
             DatePickerDialog(
                 this,
                 R.style.Theme_FinWise_DatePickerDialog,
@@ -88,9 +123,61 @@ class AddExpenseActivity : AppCompatActivity() {
         etDate.setText(displayFormat.format(selectedCalendar.time))
     }
 
-    private fun saveExpense() {
+    // --- Helper to populate UI for Edit Mode ---
+    private fun setupEditMode(title: String?, amount: Float, category: String?, dateString: String?) {
+        // 1. Change header and button text
+        try {
+            tvHeaderTitle.text = "Edit Expense"
+        } catch (e: Exception) { /* Ignore if view not found */ }
+        btnSave.text = "Update Expense"
+
+        // 2. Pre-fill inputs
+        etNote.setText(title)
+        etAmount.setText(amount.toString())
+
+        // 3. Select the correct category in the spinner
+        category?.let {
+            // Find case-insensitive match
+            val index = categories.indexOfFirst { cat -> cat.equals(it, ignoreCase = true) }
+            if (index != -1) {
+                spinnerCategory.setSelection(index)
+            }
+        }
+
+        // 4. Set the date
+        dateString?.let { parseAndSetDate(it) }
+    }
+
+    private fun parseAndSetDate(dateString: String) {
+        try {
+            // Try parsing the full ISO format first
+            val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+            isoFormat.timeZone = TimeZone.getTimeZone("UTC") // API sends UTC
+            val date = isoFormat.parse(dateString)
+            if (date != null) {
+                selectedCalendar.time = date
+            }
+        } catch (e: Exception) {
+            try {
+                // Fallback to simpler format if milliseconds/time are missing
+                val simpleFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+                val date = simpleFormat.parse(dateString.substringBefore("T"))
+                if (date != null) {
+                    selectedCalendar.time = date
+                }
+            } catch (e2: Exception) {
+                // If parsing fails, just leave it as today's date
+            }
+        }
+        updateDateLabel()
+    }
+    // -------------------------------------------
+
+    // --- Main Save Handler ---
+    private fun handleSaveButtonClick() {
         val amountStr = etAmount.text.toString().trim()
         val category = categories[spinnerCategory.selectedItemPosition]
+        // Use category as title if note is empty
         val title = etNote.text.toString().trim().ifEmpty { category }
 
         if (amountStr.isEmpty()) {
@@ -106,11 +193,16 @@ class AddExpenseActivity : AppCompatActivity() {
         val amountValue: Float
         try {
             amountValue = amountStr.toFloat()
+            if (amountValue <= 0) {
+                Toast.makeText(this, "Amount must be greater than 0", Toast.LENGTH_SHORT).show()
+                return
+            }
         } catch (e: NumberFormatException) {
             Toast.makeText(this, "Invalid amount format", Toast.LENGTH_SHORT).show()
             return
         }
 
+        // Format date for backend (ISO 8601)
         val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
         val dateStringForBackend = isoFormat.format(selectedCalendar.time)
 
@@ -123,8 +215,37 @@ class AddExpenseActivity : AppCompatActivity() {
         )
 
         btnSave.isEnabled = false
-        btnSave.text = "Saving..."
+        btnSave.text = if (isEditMode) "Updating..." else "Saving..."
 
+        if (isEditMode) {
+            updateExpense(expenseIdToEdit, request)
+        } else {
+            addExpense(request)
+        }
+    }
+    // -------------------------
+
+    // --- API CALL: UPDATE EXISTING EXPENSE ---
+    private fun updateExpense(id: Int, request: ExpenseCreateRequest) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                RetrofitClient.instance.updateExpense(id, request)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@AddExpenseActivity, "Expense updated!", Toast.LENGTH_SHORT).show()
+                    finish() // Close activity and return to Budget screen
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@AddExpenseActivity, "Update failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                    resetButtonState()
+                }
+            }
+        }
+    }
+    // -----------------------------------------
+
+    // --- API CALL: ADD NEW EXPENSE ---
+    private fun addExpense(request: ExpenseCreateRequest) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = RetrofitClient.instance.addExpense(request)
@@ -135,10 +256,14 @@ class AddExpenseActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@AddExpenseActivity, "Failed to save: ${e.message}", Toast.LENGTH_SHORT).show()
-                    btnSave.isEnabled = true
-                    btnSave.text = "Save Expense"
+                    resetButtonState()
                 }
             }
         }
+    }
+
+    private fun resetButtonState() {
+        btnSave.isEnabled = true
+        btnSave.text = if (isEditMode) "Update Expense" else "Save Expense"
     }
 }

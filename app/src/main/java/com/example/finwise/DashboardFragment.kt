@@ -1,6 +1,6 @@
 package com.example.finwise
 
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,44 +8,64 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
-// Note: Retrofit and Coroutines imports are removed as they aren't needed here anymore
+import com.example.finwise.api.RetrofitClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DashboardFragment : Fragment() {
 
     private lateinit var tvXp: TextView
-    // tvWelcome is removed because it's not in this fragment's layout
     private var userEmail: String? = null
 
-    // 1. Inflate the layout for this fragment
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Tell the fragment which XML layout to use
+        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_dashboard, container, false)
     }
 
-    // 2. Initialize views and start logic after view is created
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Get user email from the parent Activity intent
-        userEmail = requireActivity().intent.getStringExtra("USER_EMAIL")
+        // 1. Get User Email from shared preferences
+        val sharedPref = requireActivity().getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
+        userEmail = sharedPref.getString("LOGGED_IN_EMAIL", null)
 
-        // Initialize Views that ARE in this fragment layout
+        // 2. Initialize Views that actually exist in your current XML
         tvXp = view.findViewById(R.id.tvXp)
         val cardBudget = view.findViewById<CardView>(R.id.cardBudget)
 
-        // FOR NOW: We will just set a hardcoded XP value.
-        // Tomorrow, when we do gamification, we will fetch real XP data here.
-        tvXp.text = "150" // Placeholder value
+        // 3. Load Data (Only XP for now, as other views are missing)
+        userEmail?.let {
+            fetchUserData(it)
+        }
 
-        // Set click listener for the Budget card to open the Budget screen
+        // 4. Navigation to Budget tab
         cardBudget.setOnClickListener {
-            // Use "requireContext()" for intents within fragments
-            val intent = Intent(requireContext(), BudgetActivity::class.java)
-            intent.putExtra("USER_EMAIL", userEmail)
-            startActivity(intent)
+            // Find the ViewPager in the parent Activity and move to index 1 (Budget)
+            val viewPager = requireActivity().findViewById<androidx.viewpager2.widget.ViewPager2>(R.id.viewPager)
+            viewPager.currentItem = 1
+        }
+    }
+
+    private fun fetchUserData(email: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // We use the same getUserDetails endpoint to get XP
+                val userProfile = RetrofitClient.instance.getUserDetails(email)
+                withContext(Dispatchers.Main) {
+                    if(isAdded) {
+                        tvXp.text = userProfile.xp.toString()
+                        // Note: Your current XML doesn't have a place for the Welcome message,
+                        // so we can't set userProfile.name anywhere yet.
+                    }
+                }
+            } catch (e: Exception) {
+                // Handle error silently
+            }
         }
     }
 }

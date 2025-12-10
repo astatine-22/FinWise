@@ -1,7 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Theme.FinWise" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/finwise_green</item>
-        <item name="colorPrimaryVariant">#1B5E20</item> <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">#1B5E20</item>
+        <item name="colorOnPrimary">@color/white</item>
         <item name="colorSecondary">@color/finwise_green</item>
         <item name="colorSecondaryVariant">#1B5E20</item>
         <item name="colorOnSecondary">@color/black</item>
@@ -10,12 +11,10 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="colorPrimaryDark" tools:targetApi="l">#1B5E20</item>
 
-
         <item name="android:textColorPrimary">@color/black</item>
         <item name="android:windowBackground">#F8F9FA</item>
-
-
     </style>
+
     <style name="Theme.FinWise.DatePickerDialog" parent="Theme.MaterialComponents.Light.Dialog">
         <item name="colorPrimary">#4CAF50</item>
         <item name="colorAccent">#4CAF50</item>
@@ -24,4 +23,23 @@
         <item name="android:textColorSecondary">#999999</item>
     </style>
 
+
+    <style name="FinWiseAlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:background">@drawable/bg_dialog_rounded</item>
+
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowTitleStyle">@null</item>
+
+        <item name="buttonBarPositiveButtonStyle">@style/FinWiseAlertDialogButton.Delete</item>
+        <item name="buttonBarNegativeButtonStyle">@style/FinWiseAlertDialogButton.Cancel</item>
+    </style>
+
+    <style name="FinWiseAlertDialogButton.Delete" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">#D32F2F</item>
+    </style>
+
+    <style name="FinWiseAlertDialogButton.Cancel" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">#757575</item>
+    </style>
 </resources>

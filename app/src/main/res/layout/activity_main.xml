@@ -45,12 +45,7 @@
                 android:textStyle="bold"/>
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/ivNotification"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/ic_notification"
-            app:tint="#333333"/>
+
     </LinearLayout>
 
     <androidx.viewpager2.widget.ViewPager2
