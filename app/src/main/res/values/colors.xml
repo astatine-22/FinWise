@@ -4,13 +4,19 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="finwise_green">#33AC36</color>
+    <color name="dark_green">#1B5E20</color>
+    <color name="red_error">#D32F2F</color>
 
     <color name="splash_background">#F8F9FA</color>
     <color name="logo_circle_bg">#E6F4F1</color>
     <color name="text_title">#2D2D2D</color>
     <color name="text_subtitle">#757575</color>
 
-    <color name="card_budget_bg">#E8F5E9</color>   <color name="card_learn_bg">#FFF3E0</color>     <color name="card_goals_bg">#F3E5F5</color>     <color name="card_trading_bg">#E3F2FD</color>   <color name="progress_budget">#66BB6A</color>
+    <color name="card_budget_bg">#E8F5E9</color>
+    <color name="card_learn_bg">#FFF3E0</color>
+    <color name="card_goals_bg">#F3E5F5</color>
+    <color name="card_trading_bg">#E3F2FD</color>
+    <color name="progress_budget">#66BB6A</color>
     <color name="progress_goals">#AB47BC</color>
     <color name="text_gain_green">#2E7D32</color>
 
@@ -18,4 +24,8 @@
     <color name="cat_shopping">#9C27B0</color>
     <color name="cat_transport">#03A9F4</color>
     <color name="cat_entertainment">#009688</color>
+
+    <!-- Exchange badge colors -->
+    <color name="blue_primary">#1976D2</color>
+    <color name="orange_crypto">#E65100</color>
 </resources>

@@ -18,6 +18,9 @@
             android:name=".AddExpenseActivity"
             android:exported="false" />
         <activity
+            android:name=".BuyAssetActivity"
+            android:exported="false" />
+        <activity
             android:name=".BudgetActivity"
             android:exported="false" />
         <activity

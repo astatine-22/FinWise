@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
                     viewPager.currentItem = 2
                     true
                 }
-                R.id.nav_profile -> {
+                R.id.nav_trade -> {
                     viewPager.currentItem = 3
                     true
                 }

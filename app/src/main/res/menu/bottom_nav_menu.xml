@@ -16,7 +16,7 @@
         android:title="Learn" />
 
     <item
-        android:id="@+id/nav_profile"
-        android:icon="@drawable/ic_person"
-        android:title="Profile" />
+        android:id="@+id/nav_trade"
+        android:icon="@drawable/ic_chart"
+        android:title="Trade" />
 </menu>

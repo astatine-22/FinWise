@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:fitsSystemWindows="true">
+
+    <!-- Header -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_arrow_back"
+            android:padding="2dp"
+            app:tint="#333333" />
+
+        <TextView
+            android:id="@+id/tvHeaderTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Paper Trading"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:gravity="center"
+            android:layout_marginStart="8dp" />
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_search"
+            android:visibility="invisible" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout"
+        app:layout_constraintBottom_toTopOf="@id/buttonsLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp">
+
+            <!-- Stock Selector Tabs -->
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/stockTabsGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                android:layout_marginBottom="16dp">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipSearchStock"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔍 Search Stock"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    app:chipBackgroundColor="@color/chip_background_selector"
+                    app:checkedIconVisible="false" />
+            </com.google.android.material.chip.ChipGroup>
+
+            <!-- Search Section (Initially Visible) -->
+            <LinearLayout
+                android:id="@+id/searchSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxStrokeColor="@color/finwise_green"
+                    app:hintEnabled="false"
+                    app:endIconMode="custom"
+                    app:endIconDrawable="@drawable/ic_search">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etSymbol"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Search stocks (e.g., Reliance, Apple)"
+                        android:textColorHint="#999999"
+                        android:inputType="text"
+                        android:textSize="15sp"
+                        android:textColor="#333333" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Search Suggestions -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/suggestionsCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    android:layout_marginTop="4dp">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvSuggestions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxHeight="200dp" />
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+            <!-- Stock Details Section (Initially Hidden) -->
+            <LinearLayout
+                android:id="@+id/stockDetailsSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Price Display -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        android:id="@+id/tvCurrentPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₹2,500.00"
+                        android:textColor="#333333"
+                        android:textSize="36sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvPriceChange"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+₹42.50 (+2.4%)"
+                        android:textColor="#4CAF50"
+                        android:textSize="14sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- Info Cards Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="20dp"
+                    android:weightSum="2">
+
+                    <!-- Available Cash Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#F5F5F5">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="AVAILABLE CASH"
+                                android:textColor="#757575"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:id="@+id/tvAvailableCash"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="₹1,00,000.00"
+                                android:textColor="#333333"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Holdings Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#F5F5F5">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="HOLDINGS"
+                                android:textColor="#757575"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:id="@+id/tvHoldings"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0 shares"
+                                android:textColor="#333333"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- Avg Price and P&L Row -->
+                <LinearLayout
+                    android:id="@+id/holdingStatsRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone"
+                    android:weightSum="2">
+
+                    <!-- Avg Buy Price -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Avg. Buy Price"
+                            android:textColor="#757575"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvAvgBuyPrice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="₹0.00"
+                            android:textColor="#333333"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+
+                    <!-- Unrealized P&L -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="end">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Unrealized P&amp;L"
+                            android:textColor="#757575"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvUnrealizedPnl"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="+₹0.00"
+                            android:textColor="#4CAF50"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Quantity Selector -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="24dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Quantity to buy"
+                        android:textColor="#757575"
+                        android:textSize="12sp"
+                        android:layout_gravity="center" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="12dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnMinus"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:text="-"
+                            android:textSize="24sp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="#E0E0E0"
+                            app:cornerRadius="24dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp" />
+
+                        <EditText
+                            android:id="@+id/etQuantity"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:text="1"
+                            android:textSize="28sp"
+                            android:textStyle="bold"
+                            android:textColor="#333333"
+                            android:gravity="center"
+                            android:inputType="numberDecimal"
+                            android:background="@null"
+                            android:layout_marginHorizontal="16dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnPlus"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:text="+"
+                            android:textSize="24sp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="#E0E0E0"
+                            app:cornerRadius="24dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp" />
+                    </LinearLayout>
+
+                    <!-- Quick Percentage Buttons -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="12dp">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip25"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="25%"
+                            android:textColor="#333333"
+                            android:textSize="13sp"
+                            app:chipBackgroundColor="#E8E8E8"
+                            app:chipStrokeWidth="1dp"
+                            app:chipStrokeColor="#BDBDBD"
+                            app:chipCornerRadius="16dp"
+                            android:layout_marginEnd="8dp" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip50"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="50%"
+                            android:textColor="#333333"
+                            android:textSize="13sp"
+                            app:chipBackgroundColor="#E8E8E8"
+                            app:chipStrokeWidth="1dp"
+                            app:chipStrokeColor="#BDBDBD"
+                            app:chipCornerRadius="16dp"
+                            android:layout_marginEnd="8dp" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipMax"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Max"
+                            android:textColor="#333333"
+                            android:textSize="13sp"
+                            app:chipBackgroundColor="#E8E8E8"
+                            app:chipStrokeWidth="1dp"
+                            app:chipStrokeColor="#BDBDBD"
+                            app:chipCornerRadius="16dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Exchange Toggle for Indian Stocks -->
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/exchangeToggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:visibility="gone"
+                    app:singleSelection="true"
+                    app:selectionRequired="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnNse"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="NSE"
+                        android:textSize="11sp"
+                        android:textColor="@color/toggle_text_color"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="@color/finwise_green"
+                        app:backgroundTint="@color/toggle_background_color" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBse"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="BSE"
+                        android:textSize="11sp"
+                        android:textColor="@color/toggle_text_color"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="@color/finwise_green"
+                        app:backgroundTint="@color/toggle_background_color" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <!-- Price History Chart Section -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#FAFAFA">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <!-- Chart Header -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Price History"
+                                android:textColor="#333333"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <!-- Period Tabs -->
+                            <com.google.android.material.button.MaterialButtonToggleGroup
+                                android:id="@+id/periodToggle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:singleSelection="true"
+                                app:selectionRequired="true">
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btn1D"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="36dp"
+                                    android:text="1D"
+                                    android:textColor="#333333"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"
+                                    android:paddingHorizontal="16dp"
+                                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                    app:strokeWidth="1dp"
+                                    app:strokeColor="#BDBDBD"
+                                    app:backgroundTint="#F5F5F5"
+                                    android:insetTop="0dp"
+                                    android:insetBottom="0dp" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btn1W"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="36dp"
+                                    android:text="1W"
+                                    android:textColor="#333333"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"
+                                    android:paddingHorizontal="16dp"
+                                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                    app:strokeWidth="1dp"
+                                    app:strokeColor="#BDBDBD"
+                                    app:backgroundTint="#F5F5F5"
+                                    android:insetTop="0dp"
+                                    android:insetBottom="0dp" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btn1M"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="36dp"
+                                    android:text="1M"
+                                    android:textColor="#333333"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"
+                                    android:paddingHorizontal="16dp"
+                                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                    app:strokeWidth="1dp"
+                                    app:strokeColor="#BDBDBD"
+                                    app:backgroundTint="#F5F5F5"
+                                    android:insetTop="0dp"
+                                    android:insetBottom="0dp" />
+                            </com.google.android.material.button.MaterialButtonToggleGroup>
+                        </LinearLayout>
+
+                        <!-- Line Chart -->
+                        <com.github.mikephil.charting.charts.LineChart
+                            android:id="@+id/priceChart"
+                            android:layout_width="match_parent"
+                            android:layout_height="150dp"
+                            android:layout_marginTop="12dp" />
+
+                        <!-- Chart Loading -->
+                        <ProgressBar
+                            android:id="@+id/chartLoading"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:visibility="gone" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Estimated Cost -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#E8F5E9">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Estimated Cost"
+                            android:textColor="#1B5E20"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/tvEstimatedCost"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="₹0.00"
+                            android:textColor="#1B5E20"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Buy/Sell Buttons -->
+    <LinearLayout
+        android:id="@+id/buttonsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:weightSum="2"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBuy"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Buy"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            app:backgroundTint="#4CAF50" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSell"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Sell"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:enabled="false"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:strokeColor="#F44336"
+            app:strokeWidth="2dp"
+            android:textColor="#F44336"
+            app:cornerRadius="12dp" />
+    </LinearLayout>
+
+    <!-- Loading Overlay -->
+    <FrameLayout
+        android:id="@+id/loadingOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80FFFFFF"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
