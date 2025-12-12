@@ -1,8 +1,11 @@
 package com.example.finwise
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.widget.Toast
+import android.util.Base64
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.example.finwise.api.RetrofitClient
@@ -17,7 +20,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var bottomNav: BottomNavigationView
     private lateinit var viewPager: ViewPager2
-    private lateinit var tvUserNameHeader: android.widget.TextView
+    private lateinit var tvUserNameHeader: TextView
+    private lateinit var ivProfile: ImageView
     private var userEmail: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,17 +31,30 @@ class MainActivity : AppCompatActivity() {
         userEmail = intent.getStringExtra("USER_EMAIL")
 
         tvUserNameHeader = findViewById(R.id.tvUserNameHeader)
+        ivProfile = findViewById(R.id.ivProfile)
         bottomNav = findViewById(R.id.bottomNavigationView)
         viewPager = findViewById(R.id.viewPager)
         val fabMainAdd = findViewById<FloatingActionButton>(R.id.fabMainAdd)
-        // Bell icon finding removed from here
 
         userEmail?.let { fetchHeaderInfo(it) }
 
         setupViewPager()
         setupBottomNavClicks()
         setupFabClick(fabMainAdd)
-        // Logout setup call removed from here
+        setupProfileClick()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh profile picture when returning from ProfileActivity
+        userEmail?.let { fetchHeaderInfo(it) }
+    }
+
+    private fun setupProfileClick() {
+        ivProfile.setOnClickListener {
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun setupViewPager() {
@@ -92,17 +109,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // The setupLogoutClick function is completely removed from here.
-
     private fun fetchHeaderInfo(email: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val userProfile = RetrofitClient.instance.getUserDetails(email)
                 withContext(Dispatchers.Main) {
                     tvUserNameHeader.text = userProfile.name
+                    
+                    // Load profile picture into header
+                    loadProfilePicture(userProfile.profile_picture)
                 }
             } catch (e: Exception) {
                 // Handle error silently
+            }
+        }
+    }
+
+    private fun loadProfilePicture(base64Image: String?) {
+        if (base64Image != null && base64Image.isNotEmpty()) {
+            try {
+                val imageBytes = Base64.decode(base64Image, Base64.DEFAULT)
+                val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                ivProfile.setImageBitmap(bitmap)
+                ivProfile.scaleType = ImageView.ScaleType.CENTER_CROP
+                ivProfile.setPadding(0, 0, 0, 0)
+                ivProfile.imageTintList = null
+            } catch (e: Exception) {
+                // Keep default icon on error
             }
         }
     }

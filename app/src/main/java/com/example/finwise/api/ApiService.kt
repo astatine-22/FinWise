@@ -18,8 +18,12 @@ data class SignupRequest(val name: String, val email: String, val password: Stri
 data class LoginRequest(val email: String, val password: String)
 data class GoogleLoginRequest(val token: String)
 
-data class UserProfile(val name: String, val xp: Int)
+data class UserProfile(val name: String, val xp: Int, val profile_picture: String? = null)
 data class AuthResponse(val message: String, val user_id: Int?, val user: UserProfile?)
+
+data class ProfilePictureUpdate(val email: String, val profile_picture: String)
+
+data class ProfileUpdate(val email: String, val name: String? = null, val profile_picture: String? = null)
 
 // ============================================================================
 // EXPENSE & BUDGET MODELS
@@ -155,6 +159,12 @@ interface ApiService {
     @GET("api/user/{email}")
     suspend fun getUserDetails(@Path("email") email: String): UserProfile
 
+    @PUT("api/user/profile-picture")
+    suspend fun updateProfilePicture(@Body request: ProfilePictureUpdate): SimpleResponse
+
+    @PUT("api/user/profile")
+    suspend fun updateProfile(@Body request: ProfileUpdate): SimpleResponse
+
     // --- Expense Routes ---
     @POST("api/expenses")
     suspend fun addExpense(@Body request: ExpenseCreateRequest): SimpleResponse
@@ -241,7 +251,7 @@ interface ApiService {
 
 object RetrofitClient {
     // IMPORTANT: Use your computer's real local IP address here for physical devices.
-    private const val BASE_URL = "http://172.18.0.149:8000/"
+    private const val BASE_URL = "https://patrilateral-imprudently-jennell.ngrok-free.dev/"
 
     val instance: ApiService by lazy {
         val retrofit = Retrofit.Builder()
