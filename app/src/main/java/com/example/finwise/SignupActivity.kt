@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.finwise.api.RetrofitClient
+import com.example.finwise.api.SessionManager
 import com.example.finwise.api.SignupRequest
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -24,9 +25,9 @@ import kotlinx.coroutines.withContext
 class SignupActivity : AppCompatActivity() {
 
     private lateinit var googleSignInClient: GoogleSignInClient
-    // REMOVED: private val RC_SIGN_IN = 9001
+    private lateinit var sessionManager: SessionManager
 
-    // --- NEW: Define the Activity Result Launcher ---
+    // Google Sign-In launcher
     private val googleSignInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val data: Intent? = result.data
         val task = GoogleSignIn.getSignedInAccountFromIntent(data)
@@ -38,20 +39,24 @@ class SignupActivity : AppCompatActivity() {
             Toast.makeText(this, "Google Sign-In Failed.", Toast.LENGTH_SHORT).show()
         }
     }
-    // -------------------------------------------------
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup)
 
-        // --- CONFIGURE GOOGLE SIGN-IN ---
+        // Initialize SessionManager
+        sessionManager = SessionManager.getInstance(this)
+
+        // Initialize RetrofitClient
+        RetrofitClient.initialize(this)
+
+        // Configure Google Sign-In
         val gsoClientId = getString(R.string.google_web_client_id)
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(gsoClientId)
             .requestEmail()
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
-        // --------------------------------
 
         // Views
         val etName = findViewById<EditText>(R.id.etName)
@@ -87,14 +92,23 @@ class SignupActivity : AppCompatActivity() {
         }
     }
 
-    // --- Helper functions for Standard Signup ---
+    /**
+     * Perform standard email/password signup.
+     * On success, saves JWT token and user info.
+     */
     private fun performStandardSignup(name: String, email: String, pass: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val request = SignupRequest(name, email, pass)
-                RetrofitClient.instance.signup(request)
+                val response = RetrofitClient.instance.signup(request)
+                
                 withContext(Dispatchers.Main) {
-                    saveUserAndProceed(email)
+                    // Save JWT token and user data
+                    saveSessionAndProceed(
+                        token = response.access_token,
+                        email = email,
+                        name = response.user?.name ?: name
+                    )
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
@@ -104,15 +118,17 @@ class SignupActivity : AppCompatActivity() {
         }
     }
 
-    // --- GOOGLE SIGN-IN FUNCTIONS ---
+    /**
+     * Sign in with Google
+     */
     private fun signInWithGoogle() {
-        // UPDATED: Use the new launcher
         val signInIntent = googleSignInClient.signInIntent
         googleSignInLauncher.launch(signInIntent)
     }
 
-    // REMOVED: override fun onActivityResult(...) { ... }
-
+    /**
+     * Handle Google authentication with backend.
+     */
     private fun handleGoogleAuthInBackend(idToken: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -124,7 +140,11 @@ class SignupActivity : AppCompatActivity() {
                     val finalEmail = acct?.email ?: ""
 
                     if (finalEmail.isNotEmpty()) {
-                        saveUserAndProceed(finalEmail)
+                        saveSessionAndProceed(
+                            token = response.access_token,
+                            email = finalEmail,
+                            name = response.user?.name ?: acct?.displayName
+                        )
                     } else {
                         Toast.makeText(this@SignupActivity, "Error: Could not get email", Toast.LENGTH_SHORT).show()
                     }
@@ -139,13 +159,22 @@ class SignupActivity : AppCompatActivity() {
         }
     }
 
-    // --- COMMON NAVIGATION ---
-    private fun saveUserAndProceed(email: String) {
+    /**
+     * Save session data and navigate to MainActivity.
+     */
+    private fun saveSessionAndProceed(token: String, email: String, name: String?) {
+        // Save to SessionManager
+        sessionManager.saveSession(token, email, name ?: "User")
+        
+        // Also save to legacy SharedPreferences for backward compatibility
         val sharedPref = getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
         sharedPref.edit()
             .putString("LOGGED_IN_EMAIL", email)
             .putBoolean("COMPLETED_ONBOARDING", true)
             .apply()
+        
+        // Refresh RetrofitClient to pick up the new token
+        RetrofitClient.refreshClient()
 
         Toast.makeText(this, "Welcome!", Toast.LENGTH_SHORT).show()
         goToMainActivity(email)

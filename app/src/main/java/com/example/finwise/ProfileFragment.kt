@@ -282,9 +282,15 @@ class ProfileFragment : Fragment() {
     }
 
     private fun performLogout() {
-        // Clear shared preferences
+        // Clear SessionManager (JWT tokens)
+        com.example.finwise.api.SessionManager.getInstance(requireContext()).clearSession()
+        
+        // Clear legacy shared preferences
         val sharedPref = requireActivity().getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
         sharedPref.edit().clear().apply()
+        
+        // Refresh RetrofitClient to remove auth interceptor token
+        com.example.finwise.api.RetrofitClient.refreshClient()
 
         // Navigate to Login screen and clear the back stack
         val intent = Intent(requireContext(), LoginActivity::class.java)

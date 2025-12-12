@@ -19,11 +19,21 @@ data class LoginRequest(val email: String, val password: String)
 data class GoogleLoginRequest(val token: String)
 
 data class UserProfile(val name: String, val xp: Int, val profile_picture: String? = null)
+
+// New token-based authentication response
+data class TokenResponse(
+    val access_token: String,
+    val token_type: String = "bearer",
+    val user: UserProfile? = null
+)
+
+// Legacy response (for backward compatibility)
 data class AuthResponse(val message: String, val user_id: Int?, val user: UserProfile?)
 
 data class ProfilePictureUpdate(val email: String, val profile_picture: String)
 
 data class ProfileUpdate(val email: String, val name: String? = null, val profile_picture: String? = null)
+
 
 // ============================================================================
 // EXPENSE & BUDGET MODELS
@@ -146,15 +156,15 @@ data class PriceHistoryResponse(
 
 interface ApiService {
 
-    // --- Auth Routes ---
+    // --- Auth Routes (now returning JWT tokens) ---
     @POST("api/auth/signup")
-    suspend fun signup(@Body request: SignupRequest): AuthResponse
+    suspend fun signup(@Body request: SignupRequest): TokenResponse
 
     @POST("api/auth/login")
-    suspend fun login(@Body request: LoginRequest): AuthResponse
+    suspend fun login(@Body request: LoginRequest): TokenResponse
 
     @POST("api/auth/google")
-    suspend fun googleLogin(@Body request: GoogleLoginRequest): AuthResponse
+    suspend fun googleLogin(@Body request: GoogleLoginRequest): TokenResponse
 
     @GET("api/user/{email}")
     suspend fun getUserDetails(@Path("email") email: String): UserProfile
@@ -246,19 +256,69 @@ interface ApiService {
 }
 
 // ============================================================================
-// RETROFIT CLIENT (Singleton)
+// RETROFIT CLIENT (Singleton with JWT Authentication)
 // ============================================================================
 
 object RetrofitClient {
     // IMPORTANT: Use your computer's real local IP address here for physical devices.
     private const val BASE_URL = "https://patrilateral-imprudently-jennell.ngrok-free.dev/"
 
-    val instance: ApiService by lazy {
+    @Volatile
+    private var apiService: ApiService? = null
+    
+    @Volatile
+    private var sessionManager: SessionManager? = null
+
+    /**
+     * Initialize RetrofitClient with application context.
+     * This MUST be called once from Application.onCreate() or before first API call.
+     */
+    fun initialize(context: android.content.Context) {
+        if (sessionManager == null) {
+            sessionManager = SessionManager.getInstance(context.applicationContext)
+        }
+    }
+
+    /**
+     * Get the API service instance.
+     * If not initialized, creates a basic client without auth interceptor.
+     */
+    val instance: ApiService
+        get() {
+            return apiService ?: synchronized(this) {
+                apiService ?: createApiService().also { apiService = it }
+            }
+        }
+
+    private fun createApiService(): ApiService {
+        val okHttpClientBuilder = okhttp3.OkHttpClient.Builder()
+            .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+
+        // Add AuthInterceptor if SessionManager is initialized
+        sessionManager?.let { sm ->
+            okHttpClientBuilder.addInterceptor(AuthInterceptor(sm))
+        }
+
+        val okHttpClient = okHttpClientBuilder.build()
+
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        retrofit.create(ApiService::class.java)
+        return retrofit.create(ApiService::class.java)
+    }
+
+    /**
+     * Force recreate the API service instance.
+     * Call this after login to ensure the new token is picked up by the interceptor.
+     */
+    fun refreshClient() {
+        synchronized(this) {
+            apiService = null
+        }
     }
 }
