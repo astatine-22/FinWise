@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,10 +22,16 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.finwise.api.ProfilePictureUpdate
 import com.example.finwise.api.RetrofitClient
+import com.example.finwise.data.ServiceLocator
+import com.example.finwise.data.local.entity.LocalUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -100,11 +107,105 @@ class ProfileFragment : Fragment() {
             tvUserHandle.text = handle
         }
 
-        // Fetch and display user data (including profile picture from backend)
-        userEmail?.let { fetchUserData(it) }
+        // STEP 1: Load from SharedPreferences immediately (fastest fallback)
+        loadFromSharedPrefs()
+
+        // STEP 2: Observe Room database for fresh data
+        observeLocalUser()
+
+        // STEP 3: Trigger background API refresh
+        userEmail?.let { refreshFromApi(it) }
 
         // Setup click listeners
         setupClickListeners()
+    }
+
+    // =====================================================================
+    // STEP 1: Immediate fallback from SharedPreferences
+    // =====================================================================
+    private fun loadFromSharedPrefs() {
+        val sharedPref = requireActivity().getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
+        
+        // Load cached name
+        val cachedName = sharedPref.getString("USER_NAME", null)
+        if (!cachedName.isNullOrEmpty()) {
+            tvUserName.text = cachedName
+        }
+        
+        // Load cached XP
+        val cachedXp = sharedPref.getInt("USER_XP", 0)
+        tvTotalXp.text = cachedXp.toString()
+        
+        // Load cached profile picture
+        val cachedPicture = sharedPref.getString("PROFILE_PICTURE", null)
+        if (!cachedPicture.isNullOrEmpty()) {
+            loadProfilePicture(cachedPicture)
+        }
+        
+        // Placeholders
+        tvBadges.text = "5"
+        tvModules.text = "3"
+        
+        Log.d("ProfileFragment", "Loaded from SharedPrefs: name=$cachedName, xp=$cachedXp")
+    }
+
+    // =====================================================================
+    // STEP 2: Observe Room Database for user profile
+    // =====================================================================
+    private fun observeLocalUser() {
+        val repository = ServiceLocator.getUserRepository(requireContext())
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                repository.currentUser.collectLatest { localUser ->
+                    if (isAdded && localUser != null) {
+                        Log.d("ProfileFragment", "Room emitted user: ${localUser.displayName}")
+                        updateUIFromLocalUser(localUser)
+                        
+                        // Also update SharedPreferences for next fallback
+                        saveToSharedPrefs(localUser)
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Update UI from LocalUser data (from Room database).
+     */
+    private fun updateUIFromLocalUser(user: LocalUser) {
+        tvUserName.text = user.displayName
+        tvTotalXp.text = user.xp.toString()
+        tvBadges.text = "5" // Placeholder
+        tvModules.text = "3" // Placeholder
+
+        // Load profile picture from cached data
+        loadProfilePicture(user.profilePicture)
+    }
+    
+    /**
+     * Save user data to SharedPreferences for immediate fallback on next launch.
+     */
+    private fun saveToSharedPrefs(user: LocalUser) {
+        val sharedPref = requireActivity().getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
+        sharedPref.edit()
+            .putString("USER_NAME", user.displayName)
+            .putInt("USER_XP", user.xp)
+            .putString("PROFILE_PICTURE", user.profilePicture)
+            .apply()
+    }
+
+    /**
+     * Refresh user data from API in the background.
+     * The UI updates automatically via Room Flow observation.
+     */
+    private fun refreshFromApi(email: String) {
+        val repository = ServiceLocator.getUserRepository(requireContext())
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            Log.d("ProfileFragment", "Refreshing user profile from API...")
+            repository.refreshUserProfile(email)
+        }
     }
 
     private fun loadProfilePicture(base64Image: String?) {
@@ -127,6 +228,10 @@ class ProfileFragment : Fragment() {
                 try {
                     val request = ProfilePictureUpdate(email = email, profile_picture = base64Image)
                     RetrofitClient.instance.updateProfilePicture(request)
+                    
+                    // After successful upload, refresh the local cache from API
+                    val repository = ServiceLocator.getUserRepository(requireContext())
+                    repository.refreshUserProfile(email)
                     
                     withContext(Dispatchers.Main) {
                         if (isAdded) {
@@ -220,34 +325,6 @@ class ProfileFragment : Fragment() {
         pickImageLauncher.launch("image/*")
     }
 
-    private fun fetchUserData(email: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val userProfile = RetrofitClient.instance.getUserDetails(email)
-                withContext(Dispatchers.Main) {
-                    if (isAdded) {
-                        tvUserName.text = userProfile.name
-                        tvTotalXp.text = userProfile.xp.toString()
-                        tvBadges.text = "5"
-                        tvModules.text = "3"
-                        
-                        // Load profile picture from backend
-                        loadProfilePicture(userProfile.profile_picture)
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    if (isAdded) {
-                        tvUserName.text = "User"
-                        tvTotalXp.text = "0"
-                        tvBadges.text = "0"
-                        tvModules.text = "0"
-                    }
-                }
-            }
-        }
-    }
-
     private fun setupClickListeners() {
         // Back button - finish the activity
         btnBack.setOnClickListener {
@@ -270,6 +347,12 @@ class ProfileFragment : Fragment() {
             startActivity(intent)
         }
 
+        // Hall of Fame - Navigate to LeaderboardActivity
+        view?.findViewById<LinearLayout>(R.id.btnHallOfFame)?.setOnClickListener {
+            val intent = Intent(requireContext(), LeaderboardActivity::class.java)
+            startActivity(intent)
+        }
+
         // Settings
         btnSettings.setOnClickListener {
             Toast.makeText(requireContext(), "Settings coming soon!", Toast.LENGTH_SHORT).show()
@@ -288,6 +371,9 @@ class ProfileFragment : Fragment() {
         // Clear legacy shared preferences
         val sharedPref = requireActivity().getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
         sharedPref.edit().clear().apply()
+        
+        // Clear cached repositories
+        ServiceLocator.resetAll()
         
         // Refresh RetrofitClient to remove auth interceptor token
         com.example.finwise.api.RetrofitClient.refreshClient()

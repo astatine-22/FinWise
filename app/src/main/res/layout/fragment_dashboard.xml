@@ -19,12 +19,15 @@
             android:layout_marginBottom="24dp">
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardXp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                android:layout_marginEnd="8dp">
+                android:layout_marginEnd="8dp"
+                android:clickable="true"
+                android:focusable="true">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -36,16 +39,20 @@
                         <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_star" app:tint="#FFC107"/>
                         <TextView android:id="@+id/tvXp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textStyle="bold" android:textSize="16sp" android:textColor="@color/black" android:layout_marginStart="4dp"/>
                     </LinearLayout>
+                    <TextView android:id="@+id/tvLevelTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Novice" android:textSize="10sp" android:textColor="#4CAF50" android:layout_marginTop="2dp"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardBadges"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                android:layout_marginEnd="8dp">
+                android:layout_marginEnd="8dp"
+                android:clickable="true"
+                android:focusable="true">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -55,27 +62,30 @@
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Badges" android:textSize="12sp" android:textColor="#757575"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
                         <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_badge" app:tint="#FF7043"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5" android:textStyle="bold" android:textSize="16sp" android:textColor="@color/black" android:layout_marginStart="4dp"/>
+                        <TextView android:id="@+id/tvBadgesCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textStyle="bold" android:textSize="16sp" android:textColor="@color/black" android:layout_marginStart="4dp"/>
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardStreak"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
+                app:cardElevation="0dp"
+                android:clickable="true"
+                android:focusable="true">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="12dp"
                     android:background="@color/white">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Daily Progress" android:textSize="12sp" android:textColor="#757575"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🔥 Streak" android:textSize="12sp" android:textColor="#757575"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
-                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_check_circle" app:tint="#4CAF50"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="75%" android:textStyle="bold" android:textSize="16sp" android:textColor="@color/black" android:layout_marginStart="4dp"/>
+                        <TextView android:id="@+id/tvStreak" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textStyle="bold" android:textSize="16sp" android:textColor="@color/black"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" days" android:textSize="12sp" android:textColor="#757575"/>
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -213,6 +223,62 @@
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:text="Portfolio Value" android:textSize="14sp" android:textColor="#333333" android:layout_weight="1"/>
                     <TextView android:id="@+id/tvPortfolioValue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Loading..." android:textStyle="bold" android:textColor="@color/text_gain_green"/>
                 </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Hall of Fame Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardHallOfFame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#FFF8E1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="20dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:text="🏆"
+                    android:textSize="32sp"
+                    android:gravity="center"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hall of Fame"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:textColor="#FF6F00"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="See the top XP earners!"
+                        android:textSize="14sp"
+                        android:textColor="#FFA000"
+                        android:layout_marginTop="2dp"/>
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="#FF6F00"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

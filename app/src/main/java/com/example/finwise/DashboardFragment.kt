@@ -20,7 +20,13 @@ import java.util.Locale
 
 class DashboardFragment : Fragment() {
 
+    // Gamification views
     private lateinit var tvXp: TextView
+    private lateinit var tvLevelTitle: TextView
+    private lateinit var tvBadgesCount: TextView
+    private lateinit var tvStreak: TextView
+    
+    // Budget views
     private lateinit var tvBudgetPercent: TextView
     private lateinit var progressBudget: ProgressBar
     private lateinit var tvNextLesson: TextView
@@ -42,8 +48,13 @@ class DashboardFragment : Fragment() {
         val sharedPref = requireActivity().getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
         userEmail = sharedPref.getString("LOGGED_IN_EMAIL", null)
 
-        // Initialize Views
+        // Initialize Gamification Views
         tvXp = view.findViewById(R.id.tvXp)
+        tvLevelTitle = view.findViewById(R.id.tvLevelTitle)
+        tvBadgesCount = view.findViewById(R.id.tvBadgesCount)
+        tvStreak = view.findViewById(R.id.tvStreak)
+        
+        // Initialize Other Views
         tvBudgetPercent = view.findViewById(R.id.tvBudgetPercent)
         progressBudget = view.findViewById(R.id.progressBudget)
         tvNextLesson = view.findViewById(R.id.tvNextLesson)
@@ -53,14 +64,27 @@ class DashboardFragment : Fragment() {
         val cardLearn = view.findViewById<CardView>(R.id.cardLearn)
         val cardPaperTrading = view.findViewById<CardView>(R.id.cardPaperTrading)
         val cardSavingsGoals = view.findViewById<CardView>(R.id.cardSavingsGoals)
+        
+        // Gamification cards
+        val cardXp = view.findViewById<CardView>(R.id.cardXp)
+        val cardBadges = view.findViewById<CardView>(R.id.cardBadges)
+        val cardStreak = view.findViewById<CardView>(R.id.cardStreak)
 
         // Load all data
         userEmail?.let { email ->
-            fetchUserData(email)
+            fetchGamificationData(email)  // New gamification fetch
             fetchBudgetData(email)
             fetchLearnData()
             fetchPortfolioData(email)
         }
+
+        // Gamification card click handlers - open GamificationActivity
+        val openGamification = { 
+            startActivity(android.content.Intent(requireContext(), GamificationActivity::class.java))
+        }
+        cardXp.setOnClickListener { openGamification() }
+        cardBadges.setOnClickListener { openGamification() }
+        cardStreak.setOnClickListener { openGamification() }
 
         // Navigation click listeners
         cardBudget.setOnClickListener {
@@ -81,19 +105,37 @@ class DashboardFragment : Fragment() {
         cardSavingsGoals.setOnClickListener {
             Toast.makeText(requireContext(), "Savings Goals coming soon!", Toast.LENGTH_SHORT).show()
         }
+
+        // Hall of Fame - Open LeaderboardActivity
+        view.findViewById<CardView>(R.id.cardHallOfFame).setOnClickListener {
+            startActivity(android.content.Intent(requireContext(), LeaderboardActivity::class.java))
+        }
     }
 
-    private fun fetchUserData(email: String) {
+    private fun fetchGamificationData(email: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val userProfile = RetrofitClient.instance.getUserDetails(email)
+                val gamification = RetrofitClient.instance.getUserGamification(email)
                 withContext(Dispatchers.Main) {
                     if (isAdded) {
-                        tvXp.text = userProfile.xp.toString()
+                        tvXp.text = gamification.xp.toString()
+                        tvLevelTitle.text = gamification.level_title
+                        tvBadgesCount.text = gamification.earned_achievements.size.toString()
+                        tvStreak.text = gamification.current_streak.toString()
                     }
                 }
             } catch (e: Exception) {
-                // Handle error silently
+                // Fallback to basic user data if gamification fails
+                try {
+                    val userProfile = RetrofitClient.instance.getUserDetails(email)
+                    withContext(Dispatchers.Main) {
+                        if (isAdded) {
+                            tvXp.text = userProfile.xp.toString()
+                        }
+                    }
+                } catch (e2: Exception) {
+                    // Handle error silently
+                }
             }
         }
     }

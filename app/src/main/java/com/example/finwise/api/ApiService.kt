@@ -121,6 +121,29 @@ data class TradeExecutionResponse(
     val new_average_price: Float
 )
 
+// Sell Request/Response
+data class SellRequest(
+    val email: String,
+    val symbol: String,
+    val quantity: Float
+)
+
+data class SellExecutionResponse(
+    val message: String,
+    val asset_symbol: String,
+    val quantity_sold: Float,
+    val executed_price: Float,
+    val total_proceeds: Float,
+    val remaining_cash: Float,
+    val remaining_quantity: Float
+)
+
+// Budget Limit Update
+data class BudgetLimitUpdate(
+    val email: String,
+    val budget_limit: Float
+)
+
 data class AssetPriceResponse(
     val symbol: String,
     val current_price: Float?,
@@ -148,6 +171,47 @@ data class PriceHistoryResponse(
     val price_change_percent: Float,
     val current_price: Float,
     val previous_close: Float
+)
+
+// ============================================================================
+// GAMIFICATION MODELS
+// ============================================================================
+
+data class GamificationResponse(
+    val xp: Int,
+    val level: Int,
+    val level_title: String,
+    val progress_to_next: Float,    // 0.0 to 1.0
+    val xp_for_next_level: Int,
+    val current_streak: Int,
+    val earned_achievements: List<String>  // List of achievement keys
+)
+
+data class AchievementDef(
+    val key: String,
+    val name: String,
+    val description: String,
+    val xp_reward: Int,
+    val icon_name: String
+)
+
+// ============================================================================
+// LEADERBOARD MODELS (Hall of Fame)
+// ============================================================================
+
+data class LeaderboardEntry(
+    val rank: Int,
+    val display_name: String,  // Privacy-safe: "John D."
+    val xp: Int,
+    val profile_picture: String? = null  // Base64 encoded image
+)
+
+data class LeaderboardResponse(
+    val top_users: List<LeaderboardEntry>,
+    val user_rank: Int,
+    val user_xp: Int,
+    val user_display_name: String,
+    val user_profile_picture: String? = null
 )
 
 // ============================================================================
@@ -253,6 +317,34 @@ interface ApiService {
         @Path("symbol") symbol: String,
         @Query("period") period: String = "1d"
     ): PriceHistoryResponse
+
+    @POST("api/trade/sell")
+    suspend fun executeSellOrder(
+        @Body request: SellRequest
+    ): SellExecutionResponse
+
+    @PUT("api/user/budget-limit")
+    suspend fun updateBudgetLimit(
+        @Body request: BudgetLimitUpdate
+    ): SimpleResponse
+
+    // --- Gamification Routes ---
+    @GET("api/user/gamification/{email}")
+    suspend fun getUserGamification(
+        @Path("email") email: String
+    ): GamificationResponse
+
+    @GET("api/achievements/all")
+    suspend fun getAllAchievements(): List<AchievementDef>
+
+    @POST("api/achievements/seed")
+    suspend fun seedAchievements(): SimpleResponse
+
+    // --- Leaderboard (Hall of Fame) ---
+    @GET("api/leaderboard")
+    suspend fun getLeaderboard(
+        @Query("email") email: String
+    ): LeaderboardResponse
 }
 
 // ============================================================================

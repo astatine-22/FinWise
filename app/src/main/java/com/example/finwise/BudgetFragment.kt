@@ -13,11 +13,16 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.finwise.api.CategorySummaryResponse
 import com.example.finwise.api.ExpenseResponse
 import com.example.finwise.api.RetrofitClient
+import com.example.finwise.data.ServiceLocator
+import com.example.finwise.data.local.entity.LocalExpense
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
@@ -30,9 +35,12 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.ChipGroup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class BudgetFragment : Fragment(), OnChartValueSelectedListener {
@@ -87,6 +95,10 @@ class BudgetFragment : Fragment(), OnChartValueSelectedListener {
             Toast.makeText(requireContext(), "Full breakdown coming soon!", Toast.LENGTH_SHORT).show()
         }
 
+        // OFFLINE-FIRST: Observe local database (Room) for expenses
+        observeLocalExpenses()
+
+        // Trigger initial data load (Both local + API refresh)
         loadDataForRange(currentRange)
     }
 
@@ -151,77 +163,76 @@ class BudgetFragment : Fragment(), OnChartValueSelectedListener {
         }
     }
 
-    private fun loadDataForRange(range: String) {
-        userEmail?.let { email ->
-            fetchBudgetSummary(email, range)
-            fetchCategorySummary(email, range)
-            fetchExpenses(email, range)
-        }
-    }
+    // =====================================================================
+    // OFFLINE-FIRST: Observe Room Database for expenses
+    // =====================================================================
+    private fun observeLocalExpenses() {
+        val repository = ServiceLocator.getExpenseRepository(requireContext())
 
-    // --- API Calls ---
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                repository.allExpenses.collectLatest { localExpenses ->
+                    if (isAdded) {
+                        // Convert LocalExpense to ExpenseResponse for adapter compatibility
+                        val expenseResponses = localExpenses.map { it.toExpenseResponse() }
+                        adapter.updateData(expenseResponses)
 
-    private fun fetchBudgetSummary(email: String, range: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val summary = RetrofitClient.instance.getBudgetSummary(email, range)
-                withContext(Dispatchers.Main) {
-                    if(!isAdded) return@withContext
-                    val rupeeFormat = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("en-IN"))
-
-                    totalSpentAmount = summary.total_spent
-                    totalSpentString = rupeeFormat.format(summary.total_spent)
-                    tvTotalSpent.text = totalSpentString
-
-                    val remaining = summary.limit - summary.total_spent
-                    tvRemaining.text = "${rupeeFormat.format(remaining)} left to spend"
-
-                    val progress = if (summary.limit > 0) {
-                        ((summary.total_spent / summary.limit) * 100).toInt().coerceIn(0, 100)
-                    } else 0
-                    progressBarBudget.progress = progress
-
-                    pieChart.centerText = "Total Spent\n$totalSpentString"
-                    pieChart.setCenterTextSize(16f)
-                    pieChart.setCenterTextColor(Color.parseColor("#333333"))
-                    pieChart.highlightValues(null)
-                }
-            } catch (e: Exception) {
-                // Handle error
-            }
-        }
-    }
-
-    private fun fetchCategorySummary(email: String, range: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val categoryList = RetrofitClient.instance.getCategorySummary(email, range)
-                withContext(Dispatchers.Main) {
-                    if(!isAdded) return@withContext
-                    currentCategoryList = categoryList
-                    updatePieChartData(categoryList)
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    if(isAdded) {
-                        pieChart.setNoDataText("No chart data.")
-                        currentCategoryList = emptyList()
-                        pieChart.data = null
-                        pieChart.invalidate()
+                        // Update chart data from local expenses
+                        updateChartFromLocalData(localExpenses)
                     }
                 }
             }
         }
     }
 
-    private fun updatePieChartData(categoryList: List<CategorySummaryResponse>) {
-        val entries = ArrayList<PieEntry>()
+    /**
+     * Convert LocalExpense to ExpenseResponse for UI compatibility.
+     */
+    private fun LocalExpense.toExpenseResponse(): ExpenseResponse {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val dateStr = dateFormat.format(Date(this.dateTimestamp))
+        return ExpenseResponse(
+            id = this.backendId?.toIntOrNull() ?: this.localId.toInt(),
+            title = this.description,
+            amount = this.amount.toFloat(),
+            category = this.category,
+            date = dateStr
+        )
+    }
+
+    /**
+     * Update pie chart from local expenses data.
+     */
+    private fun updateChartFromLocalData(expenses: List<LocalExpense>) {
         val rupeeFormat = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("en-IN"))
 
-        for (item in categoryList) {
-            if (item.total_amount > 0) {
-                val label = "${item.category}\n${rupeeFormat.format(item.total_amount)}"
-                entries.add(PieEntry(item.total_amount.toFloat(), label))
+        // Group by category and calculate totals
+        val categoryTotals = expenses.groupBy { it.category }
+            .mapValues { entry -> entry.value.sumOf { it.amount } }
+
+        val totalSpent = categoryTotals.values.sum()
+        totalSpentAmount = totalSpent.toFloat()
+        totalSpentString = rupeeFormat.format(totalSpent)
+        tvTotalSpent.text = totalSpentString
+
+        // Assume budget limit from SharedPreferences or default
+        val sharedPref = requireActivity().getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
+        val budgetLimit = sharedPref.getFloat("BUDGET_LIMIT", 20000f)
+
+        val remaining = budgetLimit - totalSpent
+        tvRemaining.text = "${rupeeFormat.format(remaining)} left to spend"
+
+        val progress = if (budgetLimit > 0) {
+            ((totalSpent / budgetLimit) * 100).toInt().coerceIn(0, 100)
+        } else 0
+        progressBarBudget.progress = progress
+
+        // Build pie chart entries
+        val entries = ArrayList<PieEntry>()
+        for ((category, amount) in categoryTotals) {
+            if (amount > 0) {
+                val label = "$category\n${rupeeFormat.format(amount)}"
+                entries.add(PieEntry(amount.toFloat(), label))
             }
         }
 
@@ -240,23 +251,33 @@ class BudgetFragment : Fragment(), OnChartValueSelectedListener {
 
         pieChart.data = PieData(dataSet)
         pieChart.centerText = "Total Spent\n$totalSpentString"
+        pieChart.setCenterTextSize(16f)
+        pieChart.setCenterTextColor(Color.parseColor("#333333"))
         pieChart.highlightValues(null)
         pieChart.invalidate()
         pieChart.animateY(500)
     }
 
-    private fun fetchExpenses(email: String, range: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val expenses = RetrofitClient.instance.getExpenses(email, range)
-                withContext(Dispatchers.Main) {
-                    if(isAdded) adapter.updateData(expenses)
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    if(isAdded) adapter.updateData(emptyList())
-                }
-            }
+    // =====================================================================
+    // Data Loading: Trigger API refresh in background
+    // =====================================================================
+
+    private fun loadDataForRange(range: String) {
+        userEmail?.let { email ->
+            // Trigger background refresh from API -> updates Room DB -> Flow emits -> UI updates
+            refreshFromApi(email)
+        }
+    }
+
+    /**
+     * Refresh data from API in the background.
+     * The UI updates automatically via Room Flow observation.
+     */
+    private fun refreshFromApi(email: String) {
+        val repository = ServiceLocator.getExpenseRepository(requireContext())
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repository.refreshExpenses(email)
         }
     }
 

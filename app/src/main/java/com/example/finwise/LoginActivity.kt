@@ -184,10 +184,12 @@ class LoginActivity : AppCompatActivity() {
         // Save to SessionManager (new secure storage)
         sessionManager.saveSession(token, email, name ?: "User")
         
-        // Also save to legacy SharedPreferences for backward compatibility
+        // Also save to legacy SharedPreferences for backward compatibility AND offline fallback
         val sharedPref = getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
         sharedPref.edit()
             .putString("LOGGED_IN_EMAIL", email)
+            .putString("USER_NAME", name ?: "User")  // Save name for Profile offline fallback
+            .putInt("USER_XP", 0)  // Default XP, will be updated by API later
             .putBoolean("COMPLETED_ONBOARDING", true)
             .apply()
         

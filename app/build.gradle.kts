@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -63,6 +64,16 @@ dependencies {
 
     implementation("androidx.activity:activity-ktx:1.7.2")
 
-
     implementation("com.google.android.material:material:1.9.0")
+
+    // Room Database (Offline-First Architecture)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
+    // WorkManager (Background Sync)
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // Lifecycle
+    implementation(libs.androidx.lifecycle.livedata.ktx)
 }
