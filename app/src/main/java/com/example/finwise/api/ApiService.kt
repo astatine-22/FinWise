@@ -174,6 +174,59 @@ data class PriceHistoryResponse(
 )
 
 // ============================================================================
+// MARKET DATA MODELS (INDmoney-style)
+// ============================================================================
+
+data class MarketIndex(
+    val name: String,
+    val symbol: String,
+    val value: Float,
+    val change: Float,
+    val change_percent: Float,
+    val is_positive: Boolean
+)
+
+data class MarketIndicesResponse(
+    val indices: List<MarketIndex>
+)
+
+data class StockItem(
+    val symbol: String,
+    val name: String,
+    val sector: String?,
+    val price: Float,
+    val change: Float,
+    val change_percent: Float,
+    val is_positive: Boolean,
+    val logo_initial: String
+)
+
+data class StockListResponse(
+    val stocks: List<StockItem>
+)
+
+// ============================================================================
+// CRYPTO MODELS
+// ============================================================================
+
+data class CryptoItem(
+    val symbol: String,
+    val name: String,
+    val short_name: String,
+    val price_usd: Float,
+    val price_inr: Float,
+    val change_24h: Float,
+    val change_percent_24h: Float,
+    val is_positive: Boolean,
+    val logo_initial: String
+)
+
+data class CryptoListResponse(
+    val cryptos: List<CryptoItem>,
+    val usd_to_inr: Float
+)
+
+// ============================================================================
 // GAMIFICATION MODELS
 // ============================================================================
 
@@ -345,6 +398,26 @@ interface ApiService {
     suspend fun getLeaderboard(
         @Query("email") email: String
     ): LeaderboardResponse
+
+    // --- Market Data (INDmoney-style) ---
+    @GET("api/market/indices")
+    suspend fun getMarketIndices(): MarketIndicesResponse
+
+    @GET("api/market/stocks")
+    suspend fun getAllStocks(): StockListResponse
+
+    @GET("api/market/top-gainers")
+    suspend fun getTopGainers(): StockListResponse
+
+    @GET("api/market/top-losers")
+    suspend fun getTopLosers(): StockListResponse
+
+    // --- Crypto Routes ---
+    @GET("api/crypto/list")
+    suspend fun getCryptoList(): CryptoListResponse
+
+    @GET("api/crypto/top-gainers")
+    suspend fun getCryptoGainers(): CryptoListResponse
 }
 
 // ============================================================================

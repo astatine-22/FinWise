@@ -1,4 +1,3 @@
-Starting a Gradle Daemon, 1 incompatible and 7 stopped Daemons could not be reused, use --status for details
 > Task :app:preBuild UP-TO-DATE
 > Task :app:preDebugBuild UP-TO-DATE
 > Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
@@ -10,9 +9,9 @@ Starting a Gradle Daemon, 1 incompatible and 7 stopped Daemons could not be reus
 > Task :app:mapDebugSourceSetPaths
 > Task :app:generateDebugResources
 > Task :app:packageDebugResources
+> Task :app:mergeDebugResources
 > Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
 > Task :app:extractDeepLinksDebug UP-TO-DATE
-> Task :app:mergeDebugResources
 > Task :app:parseDebugLocalResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
@@ -34,12 +33,19 @@ Starting a Gradle Daemon, 1 incompatible and 7 stopped Daemons could not be reus
 > Task :app:writeDebugSigningConfigVersions UP-TO-DATE
 > Task :app:processDebugManifestForPackage
 > Task :app:processDebugResources
+> Task :app:kspDebugKotlin
 
 > Task :app:compileDebugKotlin
 w: file:///D:/andproject/FinWise/finWise_frontend/app/src/main/java/com/example/finwise/BuyAssetActivity.kt:99:78 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
-w: file:///D:/andproject/FinWise/finWise_frontend/app/src/main/java/com/example/finwise/TradeFragment.kt:58:78 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/andproject/FinWise/finWise_frontend/app/src/main/java/com/example/finwise/CryptoCardAdapter.kt:19:64 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/andproject/FinWise/finWise_frontend/app/src/main/java/com/example/finwise/DashboardFragment.kt:203:74 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/andproject/FinWise/finWise_frontend/app/src/main/java/com/example/finwise/LeaderboardAdapter.kt:41:56 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/andproject/FinWise/finWise_frontend/app/src/main/java/com/example/finwise/LeaderboardFragment.kt:109:56 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/andproject/FinWise/finWise_frontend/app/src/main/java/com/example/finwise/StockCardAdapter.kt:19:64 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/andproject/FinWise/finWise_frontend/app/src/main/java/com/example/finwise/TradeFragment.kt:72:64 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/andproject/FinWise/finWise_frontend/app/src/main/java/com/example/finwise/TradeFragment.kt:222:48 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
 
-> Task :app:compileDebugJavaWithJavac NO-SOURCE
+> Task :app:compileDebugJavaWithJavac
 > Task :app:processDebugJavaRes UP-TO-DATE
 > Task :app:mergeDebugJavaResource UP-TO-DATE
 > Task :app:dexBuilderDebug
@@ -48,5 +54,5 @@ w: file:///D:/andproject/FinWise/finWise_frontend/app/src/main/java/com/example/
 > Task :app:createDebugApkListingFileRedirect
 > Task :app:assembleDebug
 
-BUILD SUCCESSFUL in 49s
-34 actionable tasks: 15 executed, 19 up-to-date
+BUILD SUCCESSFUL in 16s
+36 actionable tasks: 17 executed, 19 up-to-date

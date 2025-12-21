@@ -3,259 +3,389 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
+    android:background="#F5F5F5">
 
+    <!-- White Tab Section -->
+    <LinearLayout
+        android:id="@+id/tabSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:elevation="2dp">
+
+        <!-- Sub-tabs: Stocks | Crypto | Portfolio -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabMode="fixed"
+            app:tabGravity="fill"
+            app:tabTextColor="#757575"
+            app:tabSelectedTextColor="#4CAF50"
+            app:tabIndicatorColor="#4CAF50"
+            app:tabIndicatorHeight="3dp"
+            app:tabBackground="@android:color/transparent"
+            app:tabTextAppearance="@style/TabTextAppearance">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stocks" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Crypto" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Portfolio" />
+        </com.google.android.material.tabs.TabLayout>
+    </LinearLayout>
+
+    <!-- Main Content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="48dp"
         android:fillViewport="true">
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:layout_height="wrap_content">
 
-            <!-- Header -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Paper Trading"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                android:textColor="#333333" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Practice trading with virtual money"
-                android:textSize="14sp"
-                android:textColor="#757575"
-                android:layout_marginTop="4dp" />
-
-            <!-- Portfolio Summary Card -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- STOCKS TAB CONTENT -->
+            <LinearLayout
+                android:id="@+id/stocksTabContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="#1B5E20">
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="visible">
 
-                <LinearLayout
+                <!-- Market Indices Section -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Market Overview"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333" />
+
+                <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="24dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Total Portfolio Value"
-                        android:textColor="#B2DFDB"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:id="@+id/tvTotalValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="₹1,00,000.00"
-                        android:textColor="#FFFFFF"
-                        android:textSize="32sp"
-                        android:textStyle="bold"
-                        android:layout_marginTop="4dp" />
+                    android:layout_marginTop="12dp"
+                    android:scrollbars="none">
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:id="@+id/marketIndicesLayout"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="20dp">
+                        android:orientation="horizontal" />
+                </HorizontalScrollView>
 
-                        <!-- Cash Balance -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                <!-- Category Chips -->
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/categoryChipGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    app:singleSelection="true"
+                    app:selectionRequired="true">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Cash Balance"
-                                android:textColor="#B2DFDB"
-                                android:textSize="12sp" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipExplore"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Explore"
+                        android:textColor="#333333"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        app:chipBackgroundColor="@color/chip_background_selector"
+                        app:checkedIconVisible="false" />
 
-                            <TextView
-                                android:id="@+id/tvCashBalance"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="₹1,00,000.00"
-                                android:textColor="#FFFFFF"
-                                android:textSize="16sp"
-                                android:textStyle="bold"
-                                android:layout_marginTop="2dp" />
-                        </LinearLayout>
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipTopGainers"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Top Gainers"
+                        android:textColor="#333333"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        app:chipBackgroundColor="@color/chip_background_selector"
+                        app:checkedIconVisible="false" />
 
-                        <!-- Invested Value -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipTopLosers"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Top Losers"
+                        android:textColor="#333333"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        app:chipBackgroundColor="@color/chip_background_selector"
+                        app:checkedIconVisible="false" />
+                </com.google.android.material.chip.ChipGroup>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Invested Value"
-                                android:textColor="#B2DFDB"
-                                android:textSize="12sp" />
+                <!-- Stocks List -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvStocks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:nestedScrollingEnabled="false" />
 
-                            <TextView
-                                android:id="@+id/tvInvestedValue"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="₹0.00"
-                                android:textColor="#FFFFFF"
-                                android:textSize="16sp"
-                                android:textStyle="bold"
-                                android:layout_marginTop="2dp" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Action Buttons -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="20dp">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnBuyAsset"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:text="Buy Asset"
-                    android:textAllCaps="false"
-                    android:textStyle="bold"
-                    app:icon="@drawable/ic_add"
-                    app:iconGravity="textStart"
-                    app:cornerRadius="12dp"
-                    app:backgroundTint="#4CAF50" />
-
-                <View
-                    android:layout_width="12dp"
-                    android:layout_height="1dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnResetPortfolio"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:text="Reset"
-                    android:textAllCaps="false"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    app:strokeColor="#9E9E9E"
-                    app:cornerRadius="12dp" />
+                <!-- Loading -->
+                <ProgressBar
+                    android:id="@+id/stocksLoading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
             </LinearLayout>
 
-            <!-- Holdings Section Header -->
+            <!-- CRYPTO TAB CONTENT -->
             <LinearLayout
+                android:id="@+id/cryptoTabContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="28dp">
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone">
 
+                <!-- Crypto Header -->
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Your Holdings"
-                    android:textSize="18sp"
+                    android:text="Popular Cryptocurrencies"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#333333" />
 
                 <TextView
-                    android:id="@+id/tvHoldingsCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0 assets"
-                    android:textSize="14sp"
-                    android:textColor="#757575" />
+                    android:text="Trade crypto with virtual money"
+                    android:textSize="12sp"
+                    android:textColor="#757575"
+                    android:layout_marginTop="4dp" />
+
+                <!-- Crypto List -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvCrypto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:nestedScrollingEnabled="false" />
+
+                <!-- Loading -->
+                <ProgressBar
+                    android:id="@+id/cryptoLoading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
             </LinearLayout>
 
-            <!-- Holdings RecyclerView -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvHoldings"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:nestedScrollingEnabled="false" />
-
-            <!-- Empty Holdings State -->
+            <!-- PORTFOLIO TAB CONTENT -->
             <LinearLayout
-                android:id="@+id/emptyHoldingsLayout"
+                android:id="@+id/portfolioTabContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="center"
-                android:padding="40dp"
-                android:visibility="visible">
+                android:visibility="gone">
 
-                <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:src="@drawable/ic_chart"
-                    app:tint="#CCCCCC" />
-
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- Portfolio Summary Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="No Holdings Yet"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#333333"
-                    android:layout_marginTop="16dp" />
+                    android:layout_margin="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#1B5E20">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Start trading by buying your first asset!"
-                    android:textSize="13sp"
-                    android:textColor="#757575"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center" />
-            </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
 
-            <!-- Popular Stocks Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Popular Indian Stocks"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#333333"
-                android:layout_marginTop="28dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total Portfolio Value"
+                            android:textColor="#B2DFDB"
+                            android:textSize="12sp" />
 
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:scrollbars="none">
+                        <TextView
+                            android:id="@+id/tvTotalValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="₹1,00,000.00"
+                            android:textColor="#FFFFFF"
+                            android:textSize="28sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="4dp" />
 
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="16dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Cash Balance"
+                                    android:textColor="#B2DFDB"
+                                    android:textSize="11sp" />
+
+                                <TextView
+                                    android:id="@+id/tvCashBalance"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="₹1,00,000.00"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Invested"
+                                    android:textColor="#B2DFDB"
+                                    android:textSize="11sp" />
+
+                                <TextView
+                                    android:id="@+id/tvInvestedValue"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="₹0.00"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Action Buttons -->
                 <LinearLayout
-                    android:id="@+id/popularStocksLayout"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
 
-                    <!-- Stock chips will be added programmatically -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBuyAsset"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="Buy Asset"
+                        android:textAllCaps="false"
+                        app:cornerRadius="10dp"
+                        app:backgroundTint="#4CAF50" />
+
+                    <View
+                        android:layout_width="12dp"
+                        android:layout_height="1dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnResetPortfolio"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="Reset"
+                        android:textAllCaps="false"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="#9E9E9E"
+                        app:cornerRadius="10dp" />
                 </LinearLayout>
-            </HorizontalScrollView>
 
-        </LinearLayout>
+                <!-- Holdings Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Your Holdings"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#333333" />
+
+                    <TextView
+                        android:id="@+id/tvHoldingsCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 assets"
+                        android:textSize="12sp"
+                        android:textColor="#757575" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvHoldings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="16dp"
+                    android:nestedScrollingEnabled="false" />
+
+                <!-- Empty Holdings State -->
+                <LinearLayout
+                    android:id="@+id/emptyHoldingsLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="40dp"
+                    android:visibility="visible">
+
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@drawable/ic_chart"
+                        app:tint="#CCCCCC" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No Holdings Yet"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#333333"
+                        android:layout_marginTop="12dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Start trading by buying your first asset!"
+                        android:textSize="12sp"
+                        android:textColor="#757575"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center" />
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
     </androidx.core.widget.NestedScrollView>
 
     <!-- Loading Overlay -->

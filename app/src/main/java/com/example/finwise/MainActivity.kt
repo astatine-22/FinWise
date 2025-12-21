@@ -20,9 +20,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var bottomNav: BottomNavigationView
     private lateinit var viewPager: ViewPager2
-    private lateinit var tvUserNameHeader: TextView
+    private lateinit var tvScreenTitle: TextView
     private lateinit var ivProfile: ImageView
     private var userEmail: String? = null
+
+    // Screen titles for each tab
+    private val screenTitles = listOf("Dashboard", "Budget", "Learn", "Trade")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,13 +33,13 @@ class MainActivity : AppCompatActivity() {
 
         userEmail = intent.getStringExtra("USER_EMAIL")
 
-        tvUserNameHeader = findViewById(R.id.tvUserNameHeader)
+        tvScreenTitle = findViewById(R.id.tvScreenTitle)
         ivProfile = findViewById(R.id.ivProfile)
         bottomNav = findViewById(R.id.bottomNavigationView)
         viewPager = findViewById(R.id.viewPager)
         val fabMainAdd = findViewById<FloatingActionButton>(R.id.fabMainAdd)
 
-        userEmail?.let { fetchHeaderInfo(it) }
+        userEmail?.let { fetchProfilePicture(it) }
 
         setupViewPager()
         setupBottomNavClicks()
@@ -47,7 +50,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         // Refresh profile picture when returning from ProfileActivity
-        userEmail?.let { fetchHeaderInfo(it) }
+        userEmail?.let { fetchProfilePicture(it) }
     }
 
     private fun setupProfileClick() {
@@ -62,14 +65,20 @@ class MainActivity : AppCompatActivity() {
         viewPager.adapter = adapter
         viewPager.getChildAt(0).overScrollMode = androidx.recyclerview.widget.RecyclerView.OVER_SCROLL_NEVER
 
+        val headerLayout = findViewById<android.widget.LinearLayout>(R.id.headerLayout)
+
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
+                
+                // Update screen title based on current tab
+                tvScreenTitle.text = screenTitles.getOrElse(position) { "FinWise" }
+                
                 val menuIndex = when(position) {
                     0 -> 0 // Home
                     1 -> 1 // Budget
                     2 -> 2 // Learn
-                    3 -> 3 // Profile
+                    3 -> 3 // Trade
                     else -> 0
                 }
                 bottomNav.menu.getItem(menuIndex).isChecked = true
@@ -109,14 +118,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchHeaderInfo(email: String) {
+    private fun fetchProfilePicture(email: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val userProfile = RetrofitClient.instance.getUserDetails(email)
                 withContext(Dispatchers.Main) {
-                    tvUserNameHeader.text = userProfile.name
-                    
-                    // Load profile picture into header
                     loadProfilePicture(userProfile.profile_picture)
                 }
             } catch (e: Exception) {
