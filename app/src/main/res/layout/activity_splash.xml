@@ -7,20 +7,12 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <androidx.cardview.widget.CardView
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        app:cardCornerRadius="60dp"
-        app:cardBackgroundColor="@color/logo_circle_bg"
-        app:cardElevation="0dp"
-        android:layout_marginBottom="24dp">
-
-        <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_launcher_foreground" />
-    </androidx.cardview.widget.CardView>
+    <ImageView
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_marginBottom="24dp"
+        android:contentDescription="FinWise Logo"
+        android:src="@drawable/splash_logo" />
 
     <TextView
         android:layout_width="wrap_content"
