@@ -425,8 +425,8 @@ interface ApiService {
 // ============================================================================
 
 object RetrofitClient {
-    // IMPORTANT: Use your computer's real local IP address here for physical devices.
-    private const val BASE_URL = "https://patrilateral-imprudently-jennell.ngrok-free.dev/"
+    // Production URL (Render cloud deployment)
+    private const val BASE_URL = "https://finwise-api-z29q.onrender.com/"
 
     @Volatile
     private var apiService: ApiService? = null

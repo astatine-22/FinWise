@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+
+    <!-- Search Header -->
+    <LinearLayout
+        android:id="@+id/searchHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="#1F2937"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:background="@drawable/bg_search_field"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="12dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_search"
+                app:tint="#9CA3AF" />
+
+            <EditText
+                android:id="@+id/etSearch"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:background="@null"
+                android:hint="Search stocks, crypto..."
+                android:textColor="#1F2937"
+                android:textColorHint="#9CA3AF"
+                android:textSize="15sp"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:maxLines="1" />
+
+            <ImageView
+                android:id="@+id/btnClear"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_close"
+                android:visibility="gone"
+                app:tint="#6B7280" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Search Results (Shown when typing) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvSearchResults"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp"
+        android:visibility="gone"
+        tools:listitem="@layout/item_search_result"
+        tools:visibility="gone" />
+
+    <!-- Empty State for Search Results -->
+    <LinearLayout
+        android:id="@+id/emptyResults"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No results found"
+            android:textSize="16sp"
+            android:textColor="#6B7280"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Content Container (Shown by default) -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/trendingContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+            
+            <!-- SECTION 1: INDIAN STOCKS -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🇮🇳 Indian Market"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#111827"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="12dp" />
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmerIndianStocks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp">
+                        <include layout="@layout/shimmer_stock_card" />
+                        <include layout="@layout/shimmer_stock_card" />
+                        <include layout="@layout/shimmer_stock_card" />
+                    </LinearLayout>
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvIndianStocks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="12dp"
+                    android:visibility="gone"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/item_trending_stock" />
+            </LinearLayout>
+
+            <!-- SECTION 2: US STOCKS -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🇺🇸 US Market"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#111827"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="12dp" />
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmerUsStocks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp">
+                        <include layout="@layout/shimmer_stock_card" />
+                        <include layout="@layout/shimmer_stock_card" />
+                        <include layout="@layout/shimmer_stock_card" />
+                    </LinearLayout>
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvUsStocks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="12dp"
+                    android:visibility="gone"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/item_trending_stock" />
+            </LinearLayout>
+
+            <!-- SECTION 3: CRYPTO -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="₿ Crypto"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#111827"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="12dp" />
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmerCrypto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp">
+                        <include layout="@layout/shimmer_stock_card" />
+                        <include layout="@layout/shimmer_stock_card" />
+                        <include layout="@layout/shimmer_stock_card" />
+                    </LinearLayout>
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvCrypto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="12dp"
+                    android:visibility="gone"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/item_trending_stock" />
+            </LinearLayout>
+            
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

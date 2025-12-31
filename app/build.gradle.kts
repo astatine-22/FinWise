@@ -76,4 +76,7 @@ dependencies {
 
     // Lifecycle
     implementation(libs.androidx.lifecycle.livedata.ktx)
+
+    // Shimmer Loading Effect
+    implementation("com.facebook.shimmer:shimmer:0.5.0")
 }

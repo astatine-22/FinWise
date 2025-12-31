@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
     private lateinit var tvScreenTitle: TextView
     private lateinit var ivProfile: ImageView
+    private lateinit var btnSearch: ImageView
     private var userEmail: String? = null
 
     // Screen titles for each tab
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         tvScreenTitle = findViewById(R.id.tvScreenTitle)
         ivProfile = findViewById(R.id.ivProfile)
+        btnSearch = findViewById(R.id.btnSearch)
         bottomNav = findViewById(R.id.bottomNavigationView)
         viewPager = findViewById(R.id.viewPager)
         val fabMainAdd = findViewById<FloatingActionButton>(R.id.fabMainAdd)
@@ -45,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         setupBottomNavClicks()
         setupFabClick(fabMainAdd)
         setupProfileClick()
+        setupSearchClick()
     }
 
     override fun onResume() {
@@ -56,6 +59,13 @@ class MainActivity : AppCompatActivity() {
     private fun setupProfileClick() {
         ivProfile.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun setupSearchClick() {
+        btnSearch.setOnClickListener {
+            val intent = Intent(this, SearchActivity::class.java)
             startActivity(intent)
         }
     }
@@ -73,6 +83,9 @@ class MainActivity : AppCompatActivity() {
                 
                 // Update screen title based on current tab
                 tvScreenTitle.text = screenTitles.getOrElse(position) { "FinWise" }
+                
+                // Show search button only on Trade tab (position 3)
+                btnSearch.visibility = if (position == 3) android.view.View.VISIBLE else android.view.View.GONE
                 
                 val menuIndex = when(position) {
                     0 -> 0 // Home

@@ -15,21 +15,18 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.core.content.ContextCompat
 import com.example.finwise.api.PriceHistoryResponse
 import com.example.finwise.api.RetrofitClient
 import com.example.finwise.api.StockSearchResult
 import com.example.finwise.api.TradeRequest
+import com.example.finwise.api.SellRequest
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.button.MaterialButtonToggleGroup
-import com.google.android.material.chip.Chip
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,45 +36,59 @@ import java.util.Locale
 
 class BuyAssetActivity : AppCompatActivity() {
 
-    // UI Components
+    // UI Components - Header
     private lateinit var btnBack: ImageView
-    private lateinit var tvHeaderTitle: TextView
-    private lateinit var etSymbol: EditText
-    private lateinit var suggestionsCard: CardView
-    private lateinit var rvSuggestions: RecyclerView
-    private lateinit var searchSection: LinearLayout
-    private lateinit var stockDetailsSection: LinearLayout
+    private lateinit var tvStockSymbol: TextView
+    private lateinit var tvStockName: TextView
     private lateinit var tvCurrentPrice: TextView
     private lateinit var tvPriceChange: TextView
+    private lateinit var tvDayHigh: TextView
+    private lateinit var tvDayLow: TextView
+
+    // UI Components - Search
+    private lateinit var searchSection: LinearLayout
+    private lateinit var stockDetailsSection: LinearLayout
+    private lateinit var etSymbol: EditText
+    private lateinit var suggestionsCard: androidx.cardview.widget.CardView
+    private lateinit var rvSuggestions: androidx.recyclerview.widget.RecyclerView
+    private lateinit var suggestionAdapter: StockSuggestionAdapter
+
+    // UI Components - Chart
+    private lateinit var priceChart: LineChart
+    private lateinit var chartLoading: ProgressBar
+    private lateinit var btn1D: TextView
+    private lateinit var btn1W: TextView
+    private lateinit var btn1M: TextView
+
+    // UI Components - Tabs
+    private lateinit var tabBuy: TextView
+    private lateinit var tabSell: TextView
+
+    // UI Components - Info Cards
     private lateinit var tvAvailableCash: TextView
     private lateinit var tvHoldings: TextView
-    private lateinit var holdingStatsRow: LinearLayout
-    private lateinit var tvAvgBuyPrice: TextView
-    private lateinit var tvUnrealizedPnl: TextView
+
+    // UI Components - Quantity
+    private lateinit var tvQuantityLabel: TextView
     private lateinit var btnMinus: MaterialButton
     private lateinit var btnPlus: MaterialButton
     private lateinit var etQuantity: EditText
-    private lateinit var chip25: Chip
-    private lateinit var chip50: Chip
-    private lateinit var chipMax: Chip
-    private lateinit var exchangeToggle: MaterialButtonToggleGroup
-    private lateinit var btnNse: MaterialButton
-    private lateinit var btnBse: MaterialButton
-    private lateinit var periodToggle: MaterialButtonToggleGroup
-    private lateinit var btn1D: MaterialButton
-    private lateinit var btn1W: MaterialButton
-    private lateinit var btn1M: MaterialButton
-    private lateinit var priceChart: LineChart
-    private lateinit var chartLoading: ProgressBar
+    private lateinit var tvMarketPriceHelper: TextView
+    private lateinit var chip25: TextView
+    private lateinit var chip50: TextView
+    private lateinit var chipMax: TextView
+
+    // UI Components - Exchange Toggle
+    private lateinit var exchangeToggleContainer: LinearLayout
+    private lateinit var btnNse: TextView
+    private lateinit var btnBse: TextView
+
+    // UI Components - Bottom
     private lateinit var tvEstimatedCost: TextView
-    private lateinit var btnBuy: MaterialButton
-    private lateinit var btnSell: MaterialButton
+    private lateinit var btnAction: MaterialButton
     private lateinit var loadingOverlay: FrameLayout
 
-    // Adapters
-    private lateinit var suggestionAdapter: StockSuggestionAdapter
-
-    // Data
+    // State
     private var userEmail: String? = null
     private var currentPrice: Float = 0f
     private var currentSymbol: String = ""
@@ -89,9 +100,10 @@ class BuyAssetActivity : AppCompatActivity() {
     private var currentHoldings: Float = 0f
     private var avgBuyPrice: Float = 0f
     private var currentPeriod: String = "1d"
+    private var isBuyMode: Boolean = true
 
     // Search debounce
-    private val searchHandler = Handler(Looper.getMainLooper())
+    private val searchHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
     private val SEARCH_DELAY_MS = 300L
 
@@ -107,7 +119,6 @@ class BuyAssetActivity : AppCompatActivity() {
 
         initializeViews()
         setupChart()
-        setupRecyclerView()
         setupListeners()
         loadAvailableCash()
 
@@ -125,38 +136,62 @@ class BuyAssetActivity : AppCompatActivity() {
     }
 
     private fun initializeViews() {
+        // Header
         btnBack = findViewById(R.id.btnBack)
-        tvHeaderTitle = findViewById(R.id.tvHeaderTitle)
+        tvStockSymbol = findViewById(R.id.tvStockSymbol)
+        tvStockName = findViewById(R.id.tvStockName)
+        tvCurrentPrice = findViewById(R.id.tvCurrentPrice)
+        tvPriceChange = findViewById(R.id.tvPriceChange)
+        tvDayHigh = findViewById(R.id.tvDayHigh)
+        tvDayLow = findViewById(R.id.tvDayLow)
+
+        // Search Section
+        searchSection = findViewById(R.id.searchSection)
+        stockDetailsSection = findViewById(R.id.stockDetailsSection)
         etSymbol = findViewById(R.id.etSymbol)
         suggestionsCard = findViewById(R.id.suggestionsCard)
         rvSuggestions = findViewById(R.id.rvSuggestions)
-        searchSection = findViewById(R.id.searchSection)
-        stockDetailsSection = findViewById(R.id.stockDetailsSection)
-        tvCurrentPrice = findViewById(R.id.tvCurrentPrice)
-        tvPriceChange = findViewById(R.id.tvPriceChange)
-        tvAvailableCash = findViewById(R.id.tvAvailableCash)
-        tvHoldings = findViewById(R.id.tvHoldings)
-        holdingStatsRow = findViewById(R.id.holdingStatsRow)
-        tvAvgBuyPrice = findViewById(R.id.tvAvgBuyPrice)
-        tvUnrealizedPnl = findViewById(R.id.tvUnrealizedPnl)
-        btnMinus = findViewById(R.id.btnMinus)
-        btnPlus = findViewById(R.id.btnPlus)
-        etQuantity = findViewById(R.id.etQuantity)
-        chip25 = findViewById(R.id.chip25)
-        chip50 = findViewById(R.id.chip50)
-        chipMax = findViewById(R.id.chipMax)
-        exchangeToggle = findViewById(R.id.exchangeToggle)
-        btnNse = findViewById(R.id.btnNse)
-        btnBse = findViewById(R.id.btnBse)
-        periodToggle = findViewById(R.id.periodToggle)
+        
+        // Setup suggestions RecyclerView
+        suggestionAdapter = StockSuggestionAdapter(emptyList()) { stock ->
+            onStockSelected(stock)
+        }
+        rvSuggestions.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        rvSuggestions.adapter = suggestionAdapter
+
+        // Chart
+        priceChart = findViewById(R.id.priceChart)
+        chartLoading = findViewById(R.id.chartLoading)
         btn1D = findViewById(R.id.btn1D)
         btn1W = findViewById(R.id.btn1W)
         btn1M = findViewById(R.id.btn1M)
-        priceChart = findViewById(R.id.priceChart)
-        chartLoading = findViewById(R.id.chartLoading)
+
+        // Tabs
+        tabBuy = findViewById(R.id.tabBuy)
+        tabSell = findViewById(R.id.tabSell)
+
+        // Info Cards
+        tvAvailableCash = findViewById(R.id.tvAvailableCash)
+        tvHoldings = findViewById(R.id.tvHoldings)
+
+        // Quantity
+        tvQuantityLabel = findViewById(R.id.tvQuantityLabel)
+        btnMinus = findViewById(R.id.btnMinus)
+        btnPlus = findViewById(R.id.btnPlus)
+        etQuantity = findViewById(R.id.etQuantity)
+        tvMarketPriceHelper = findViewById(R.id.tvMarketPriceHelper)
+        chip25 = findViewById(R.id.chip25)
+        chip50 = findViewById(R.id.chip50)
+        chipMax = findViewById(R.id.chipMax)
+
+        // Exchange
+        exchangeToggleContainer = findViewById(R.id.exchangeToggleContainer)
+        btnNse = findViewById(R.id.btnNse)
+        btnBse = findViewById(R.id.btnBse)
+
+        // Bottom
         tvEstimatedCost = findViewById(R.id.tvEstimatedCost)
-        btnBuy = findViewById(R.id.btnBuy)
-        btnSell = findViewById(R.id.btnSell)
+        btnAction = findViewById(R.id.btnAction)
         loadingOverlay = findViewById(R.id.loadingOverlay)
     }
 
@@ -175,30 +210,23 @@ class BuyAssetActivity : AppCompatActivity() {
             
             axisLeft.apply {
                 setDrawGridLines(true)
-                gridColor = Color.parseColor("#E0E0E0")
-                textColor = Color.parseColor("#757575")
+                gridColor = Color.parseColor("#E5E7EB")
+                textColor = Color.parseColor("#9CA3AF")
                 textSize = 10f
             }
             
             axisRight.isEnabled = false
             
-            setNoDataText("Select a stock to view chart")
-            setNoDataTextColor(Color.parseColor("#757575"))
+            setNoDataText("Loading chart...")
+            setNoDataTextColor(Color.parseColor("#9CA3AF"))
         }
-    }
-
-    private fun setupRecyclerView() {
-        suggestionAdapter = StockSuggestionAdapter(emptyList()) { stock ->
-            onStockSelected(stock)
-        }
-        rvSuggestions.layoutManager = LinearLayoutManager(this)
-        rvSuggestions.adapter = suggestionAdapter
     }
 
     private fun setupListeners() {
+        // Back button
         btnBack.setOnClickListener { finish() }
 
-        // Search with debounce
+        // Search text with debounce
         etSymbol.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -213,6 +241,10 @@ class BuyAssetActivity : AppCompatActivity() {
                 }
             }
         })
+
+        // BUY/SELL Tabs
+        tabBuy.setOnClickListener { switchToMode(isBuy = true) }
+        tabSell.setOnClickListener { switchToMode(isBuy = false) }
 
         // Quantity +/- buttons
         btnMinus.setOnClickListener {
@@ -243,41 +275,101 @@ class BuyAssetActivity : AppCompatActivity() {
             }
         })
 
-        // Exchange toggle
-        exchangeToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked && baseSymbol.isNotEmpty()) {
-                val newExchange = if (checkedId == R.id.btnNse) "NSE" else "BSE"
-                if (newExchange != currentExchange) {
-                    currentExchange = newExchange
-                    val suffix = if (currentExchange == "NSE") ".NS" else ".BO"
-                    loadStockData("$baseSymbol$suffix")
-                }
-            }
-        }
+        // Exchange toggle (NSE/BSE)
+        btnNse.setOnClickListener { switchExchange("NSE") }
+        btnBse.setOnClickListener { switchExchange("BSE") }
 
-        // Period toggle
-        periodToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked && currentSymbol.isNotEmpty()) {
-                currentPeriod = when (checkedId) {
-                    R.id.btn1D -> "1d"
-                    R.id.btn1W -> "1w"
-                    R.id.btn1M -> "1m"
-                    else -> "1d"
-                }
-                loadPriceHistory()
-            }
-        }
+        // Period tabs
+        btn1D.setOnClickListener { switchPeriod("1d", btn1D) }
+        btn1W.setOnClickListener { switchPeriod("1w", btn1W) }
+        btn1M.setOnClickListener { switchPeriod("1m", btn1M) }
 
-        // Buy button
-        btnBuy.setOnClickListener { executeTrade(isBuy = true) }
+        // Action button
+        btnAction.setOnClickListener { executeTrade() }
+    }
+
+    private fun switchToMode(isBuy: Boolean) {
+        isBuyMode = isBuy
         
-        // Sell button
-        btnSell.setOnClickListener { executeTrade(isBuy = false) }
+        if (isBuy) {
+            tabBuy.setBackgroundResource(R.drawable.bg_tab_selected_green)
+            tabBuy.setTextColor(Color.WHITE)
+            tabSell.setBackgroundResource(0)
+            tabSell.setTextColor(Color.parseColor("#6B7280"))
+            
+            btnAction.setBackgroundColor(Color.parseColor("#22C55E"))
+            btnAction.text = "BUY ${stockName.uppercase()}"
+            
+            tvQuantityLabel.text = "Number of Shares"
+            btnMinus.setTextColor(Color.parseColor("#22C55E"))
+            btnMinus.strokeColor = android.content.res.ColorStateList.valueOf(Color.parseColor("#22C55E"))
+            btnPlus.setTextColor(Color.parseColor("#22C55E"))
+            btnPlus.strokeColor = android.content.res.ColorStateList.valueOf(Color.parseColor("#22C55E"))
+        } else {
+            tabSell.setBackgroundResource(R.drawable.bg_tab_selected_red)
+            tabSell.setTextColor(Color.WHITE)
+            tabBuy.setBackgroundResource(0)
+            tabBuy.setTextColor(Color.parseColor("#6B7280"))
+            
+            btnAction.setBackgroundColor(Color.parseColor("#EF4444"))
+            btnAction.text = "SELL ${stockName.uppercase()}"
+            
+            tvQuantityLabel.text = "Shares to Sell"
+            btnMinus.setTextColor(Color.parseColor("#EF4444"))
+            btnMinus.strokeColor = android.content.res.ColorStateList.valueOf(Color.parseColor("#EF4444"))
+            btnPlus.setTextColor(Color.parseColor("#EF4444"))
+            btnPlus.strokeColor = android.content.res.ColorStateList.valueOf(Color.parseColor("#EF4444"))
+        }
+        
+        calculateEstimatedCost()
+    }
+
+    private fun switchExchange(exchange: String) {
+        if (exchange == currentExchange) return
+        currentExchange = exchange
+        
+        if (exchange == "NSE") {
+            btnNse.setBackgroundResource(R.drawable.bg_exchange_selected)
+            btnNse.setTextColor(Color.WHITE)
+            btnBse.setBackgroundResource(0)
+            btnBse.setTextColor(Color.parseColor("#6B7280"))
+        } else {
+            btnBse.setBackgroundResource(R.drawable.bg_exchange_selected)
+            btnBse.setTextColor(Color.WHITE)
+            btnNse.setBackgroundResource(0)
+            btnNse.setTextColor(Color.parseColor("#6B7280"))
+        }
+        
+        val suffix = if (exchange == "NSE") ".NS" else ".BO"
+        loadStockData("$baseSymbol$suffix")
+    }
+
+    private fun switchPeriod(period: String, selectedTab: TextView) {
+        currentPeriod = period
+        
+        // Reset all
+        listOf(btn1D, btn1W, btn1M).forEach {
+            it.setBackgroundResource(0)
+            it.setTextColor(Color.parseColor("#6B7280"))
+        }
+        
+        // Highlight selected
+        selectedTab.setBackgroundResource(R.drawable.bg_period_selected)
+        selectedTab.setTextColor(Color.WHITE)
+        
+        if (currentSymbol.isNotEmpty()) {
+            loadPriceHistory()
+        }
     }
 
     private fun setQuantityPercentage(percentage: Float) {
         if (currentPrice <= 0) return
-        val maxQuantity = (availableCash / currentPrice) * percentage
+        
+        val maxQuantity = if (isBuyMode) {
+            (availableCash / currentPrice) * percentage
+        } else {
+            currentHoldings * percentage
+        }
         etQuantity.setText(String.format("%.0f", maxQuantity.coerceAtLeast(1f)))
     }
 
@@ -305,31 +397,30 @@ class BuyAssetActivity : AppCompatActivity() {
     }
 
     private fun onStockSelected(stock: StockSearchResult) {
+        // Hide search, show stock details
         hideSuggestions()
+        etSymbol.clearFocus()
+        searchSection.visibility = View.GONE
+        stockDetailsSection.visibility = View.VISIBLE
         
         baseSymbol = stock.symbol
         stockName = stock.name
         isIndianStock = stock.exchange == "NSE/BSE"
         
         // Update header
-        tvHeaderTitle.text = stock.name
-        
-        // Hide search, show stock details
-        searchSection.visibility = View.GONE
-        stockDetailsSection.visibility = View.VISIBLE
+        tvStockSymbol.text = stock.symbol.uppercase()
+        tvStockName.text = stock.name
         
         // Show exchange toggle for Indian stocks
         if (isIndianStock) {
-            exchangeToggle.visibility = View.VISIBLE
-            exchangeToggle.check(R.id.btnNse)
-            currentExchange = "NSE"
+            exchangeToggleContainer.visibility = View.VISIBLE
+            switchExchange("NSE")
         } else {
-            exchangeToggle.visibility = View.GONE
+            exchangeToggleContainer.visibility = View.GONE
         }
         
         // Set default period
-        periodToggle.check(R.id.btn1D)
-        currentPeriod = "1d"
+        switchPeriod("1d", btn1D)
         
         // Load stock data
         val fullSymbol = when {
@@ -340,6 +431,9 @@ class BuyAssetActivity : AppCompatActivity() {
         
         loadStockData(fullSymbol)
         loadHoldings()
+        
+        // Update action button
+        btnAction.text = "BUY ${stockName.uppercase()}"
     }
 
     private fun loadStockData(symbol: String) {
@@ -373,9 +467,16 @@ class BuyAssetActivity : AppCompatActivity() {
         tvCurrentPrice.text = rupeeFormat.format(currentPrice)
         
         val changeSign = if (history.price_change >= 0) "+" else ""
-        val changeColor = if (history.price_change >= 0) "#4CAF50" else "#F44336"
         tvPriceChange.text = "$changeSign${rupeeFormat.format(history.price_change)} ($changeSign${String.format("%.2f", history.price_change_percent)}%)"
-        tvPriceChange.setTextColor(Color.parseColor(changeColor))
+        
+        // Day High/Low from price data
+        if (history.data.isNotEmpty()) {
+            val prices = history.data.map { it.price }
+            tvDayHigh.text = rupeeFormat.format(prices.maxOrNull() ?: currentPrice)
+            tvDayLow.text = rupeeFormat.format(prices.minOrNull() ?: currentPrice)
+        }
+        
+        tvMarketPriceHelper.text = "× Market Price ${rupeeFormat.format(currentPrice)}"
         
         calculateEstimatedCost()
     }
@@ -385,7 +486,7 @@ class BuyAssetActivity : AppCompatActivity() {
             Entry(index.toFloat(), point.price)
         }
         
-        val lineColor = if (history.price_change >= 0) "#4CAF50" else "#F44336"
+        val lineColor = if (history.price_change >= 0) "#22C55E" else "#EF4444"
         
         val dataSet = LineDataSet(entries, "Price").apply {
             color = Color.parseColor(lineColor)
@@ -395,7 +496,7 @@ class BuyAssetActivity : AppCompatActivity() {
             mode = LineDataSet.Mode.CUBIC_BEZIER
             setDrawFilled(true)
             fillColor = Color.parseColor(lineColor)
-            fillAlpha = 30
+            fillAlpha = 25
         }
         
         priceChart.data = LineData(dataSet)
@@ -428,27 +529,15 @@ class BuyAssetActivity : AppCompatActivity() {
                     if (holding != null) {
                         currentHoldings = holding.quantity
                         avgBuyPrice = holding.average_buy_price
-                        
-                        tvHoldings.text = "${holding.quantity} shares"
-                        holdingStatsRow.visibility = View.VISIBLE
-                        tvAvgBuyPrice.text = rupeeFormat.format(holding.average_buy_price)
-                        
-                        val pnl = (currentPrice - holding.average_buy_price) * holding.quantity
-                        val pnlSign = if (pnl >= 0) "+" else ""
-                        tvUnrealizedPnl.text = "$pnlSign${rupeeFormat.format(pnl)}"
-                        tvUnrealizedPnl.setTextColor(Color.parseColor(if (pnl >= 0) "#4CAF50" else "#F44336"))
-                        
-                        btnSell.isEnabled = true
+                        tvHoldings.text = "${holding.quantity.toInt()} shares"
                     } else {
+                        currentHoldings = 0f
                         tvHoldings.text = "0 shares"
-                        holdingStatsRow.visibility = View.GONE
-                        btnSell.isEnabled = false
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     tvHoldings.text = "0 shares"
-                    btnSell.isEnabled = false
                 }
             }
         }
@@ -459,10 +548,14 @@ class BuyAssetActivity : AppCompatActivity() {
         val cost = currentPrice * quantity
         tvEstimatedCost.text = rupeeFormat.format(cost)
         
-        btnBuy.isEnabled = quantity > 0 && cost <= availableCash && currentPrice > 0
+        btnAction.isEnabled = if (isBuyMode) {
+            quantity > 0 && cost <= availableCash && currentPrice > 0
+        } else {
+            quantity > 0 && quantity <= currentHoldings && currentPrice > 0
+        }
     }
 
-    private fun executeTrade(isBuy: Boolean) {
+    private fun executeTrade() {
         val email = userEmail ?: return
         val quantity = etQuantity.text.toString().toFloatOrNull() ?: return
         
@@ -471,19 +564,23 @@ class BuyAssetActivity : AppCompatActivity() {
             return
         }
         
-        if (isBuy) {
+        if (isBuyMode) {
             val cost = currentPrice * quantity
             if (cost > availableCash) {
                 Toast.makeText(this, "Insufficient funds", Toast.LENGTH_SHORT).show()
                 return
             }
+            executeBuyOrder(email, quantity)
         } else {
             if (quantity > currentHoldings) {
                 Toast.makeText(this, "Cannot sell more than you own", Toast.LENGTH_SHORT).show()
                 return
             }
+            executeSellOrder(email, quantity)
         }
-        
+    }
+
+    private fun executeBuyOrder(email: String, quantity: Float) {
         loadingOverlay.visibility = View.VISIBLE
         
         val tradeRequest = TradeRequest(asset_symbol = currentSymbol, quantity = quantity)
@@ -494,14 +591,12 @@ class BuyAssetActivity : AppCompatActivity() {
                 
                 withContext(Dispatchers.Main) {
                     loadingOverlay.visibility = View.GONE
-                    val action = if (isBuy) "Purchased" else "Sold"
                     Toast.makeText(
                         this@BuyAssetActivity,
-                        "✅ $action ${response.quantity} shares at ${rupeeFormat.format(response.executed_price)}",
+                        "✅ Purchased ${response.quantity.toInt()} shares at ${rupeeFormat.format(response.executed_price)}",
                         Toast.LENGTH_LONG
                     ).show()
                     
-                    // Refresh data
                     loadAvailableCash()
                     loadHoldings()
                     etQuantity.setText("1")
@@ -515,8 +610,33 @@ class BuyAssetActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        searchRunnable?.let { searchHandler.removeCallbacks(it) }
+    private fun executeSellOrder(email: String, quantity: Float) {
+        loadingOverlay.visibility = View.VISIBLE
+        
+        val sellRequest = SellRequest(email = email, symbol = currentSymbol, quantity = quantity)
+        
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitClient.instance.executeSellOrder(sellRequest)
+                
+                withContext(Dispatchers.Main) {
+                    loadingOverlay.visibility = View.GONE
+                    Toast.makeText(
+                        this@BuyAssetActivity,
+                        "✅ Sold ${response.quantity_sold.toInt()} shares at ${rupeeFormat.format(response.executed_price)}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    
+                    loadAvailableCash()
+                    loadHoldings()
+                    etQuantity.setText("1")
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    loadingOverlay.visibility = View.GONE
+                    Toast.makeText(this@BuyAssetActivity, "Sell failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 }

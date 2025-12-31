@@ -3,9 +3,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="finwise_green">#33AC36</color>
-    <color name="dark_green">#1B5E20</color>
-    <color name="red_error">#D32F2F</color>
+    <!-- Updated: Modern vibrant green (previously #33AC36) -->
+    <color name="finwise_green">#22C55E</color>
+    <color name="dark_green">#16A34A</color>
+    <color name="red_error">#EF4444</color>
 
     <color name="splash_background">#F8F9FA</color>
     <color name="logo_circle_bg">#E6F4F1</color>
@@ -16,9 +17,9 @@
     <color name="card_learn_bg">#FFF3E0</color>
     <color name="card_goals_bg">#F3E5F5</color>
     <color name="card_trading_bg">#E3F2FD</color>
-    <color name="progress_budget">#66BB6A</color>
+    <color name="progress_budget">#22C55E</color>
     <color name="progress_goals">#AB47BC</color>
-    <color name="text_gain_green">#2E7D32</color>
+    <color name="text_gain_green">#22C55E</color>
 
     <color name="cat_food">#FF9800</color>
     <color name="cat_shopping">#9C27B0</color>
@@ -28,4 +29,30 @@
     <!-- Exchange badge colors -->
     <color name="blue_primary">#1976D2</color>
     <color name="orange_crypto">#E65100</color>
+    
+    <!-- Trade section colors -->
+    <color name="trade_tab_selected">#22C55E</color>
+    <color name="trade_positive_green">#22C55E</color>
+    <color name="trade_negative_red">#EF4444</color>
+    <color name="trade_header_dark">#1F2937</color>
+    <color name="lime_accent">#22C55E</color>
+    <color name="gradient_start">#22C55E</color>
+    <color name="gradient_end">#16A34A</color>
+    <color name="text_white_70">#B3FFFFFF</color>
+    <color name="divider_light">#F3F4F6</color>
+    <color name="logo_border_grey">#E5E7EB</color>
+    
+    <!-- Pill colors -->
+    <color name="pill_positive_bg">#DCFCE7</color>
+    <color name="pill_positive_text">#22C55E</color>
+    <color name="pill_negative_bg">#FEE2E2</color>
+    <color name="pill_negative_text">#EF4444</color>
+    
+    <!-- Shimmer colors -->
+    <color name="shimmer_placeholder">#E5E7EB</color>
+    <color name="shimmer_placeholder_dark">#D1D5DB</color>
+    
+    <!-- Semantic colors -->
+    <color name="colorPositiveGreen">#22C55E</color>
+    <color name="colorNegativeRed">#EF4444</color>
 </resources>

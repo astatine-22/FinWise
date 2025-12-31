@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shimmer placeholder that mimics a stock row item -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="16dp">
+
+    <!-- Logo placeholder (circle) -->
+    <View
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_shimmer_circle" />
+
+    <!-- Text content placeholders -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
+
+        <!-- Stock name placeholder -->
+        <View
+            android:layout_width="120dp"
+            android:layout_height="16dp"
+            android:background="@color/shimmer_placeholder" />
+
+        <!-- Symbol/sector placeholder -->
+        <View
+            android:layout_width="80dp"
+            android:layout_height="12dp"
+            android:layout_marginTop="6dp"
+            android:background="@color/shimmer_placeholder_dark" />
+    </LinearLayout>
+
+    <!-- Price & change placeholder (right side) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="end">
+
+        <!-- Price placeholder -->
+        <View
+            android:layout_width="70dp"
+            android:layout_height="16dp"
+            android:background="@color/shimmer_placeholder" />
+
+        <!-- Change % placeholder -->
+        <View
+            android:layout_width="50dp"
+            android:layout_height="12dp"
+            android:layout_marginTop="6dp"
+            android:background="@color/shimmer_placeholder_dark" />
+    </LinearLayout>
+</LinearLayout>

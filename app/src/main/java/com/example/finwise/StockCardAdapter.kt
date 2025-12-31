@@ -1,11 +1,11 @@
 package com.example.finwise
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.finwise.api.StockItem
 import java.text.NumberFormat
@@ -17,12 +17,6 @@ class StockCardAdapter(
 ) : RecyclerView.Adapter<StockCardAdapter.ViewHolder>() {
 
     private val rupeeFormat = NumberFormat.getCurrencyInstance(Locale("en", "IN"))
-
-    // Color palette for stock initials
-    private val colors = listOf(
-        "#4CAF50", "#2196F3", "#9C27B0", "#FF5722", 
-        "#00BCD4", "#E91E63", "#3F51B5", "#FF9800"
-    )
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvLogoInitial: TextView = view.findViewById(R.id.tvLogoInitial)
@@ -40,24 +34,25 @@ class StockCardAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val stock = stocks[position]
+        val context = holder.itemView.context
 
         holder.tvLogoInitial.text = stock.logo_initial
         holder.tvStockName.text = stock.name
         holder.tvStockSector.text = stock.sector ?: "Stock"
         holder.tvStockPrice.text = rupeeFormat.format(stock.price)
 
-        // Set change text with arrow
-        val arrow = if (stock.is_positive) "▲" else "▼"
-        val changeText = "$arrow ${String.format("%.2f", kotlin.math.abs(stock.change_percent))}%"
+        // Set change text with +/- sign (no arrow)
+        val sign = if (stock.is_positive) "+" else "-"
+        val changeText = "$sign${String.format("%.2f", kotlin.math.abs(stock.change_percent))}%"
         holder.tvStockChange.text = changeText
+        
+        // Apply appropriate text color based on positive/negative
         holder.tvStockChange.setTextColor(
-            if (stock.is_positive) Color.parseColor("#4CAF50") 
-            else Color.parseColor("#F44336")
+            ContextCompat.getColor(
+                context,
+                if (stock.is_positive) R.color.pill_positive_text else R.color.pill_negative_text
+            )
         )
-
-        // Set logo background color via parent FrameLayout
-        val logoContainer = holder.tvLogoInitial.parent as? FrameLayout
-        logoContainer?.background?.setTint(Color.parseColor(colors[position % colors.size]))
 
         holder.itemView.setOnClickListener { onClick(stock) }
     }

@@ -45,6 +45,18 @@
             android:textStyle="bold"
             android:layout_marginStart="12dp" />
 
+        <!-- Search Button (Visible on Trade Screen) -->
+        <ImageView
+            android:id="@+id/btnSearch"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_search"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:visibility="gone"
+            app:tint="#333333"
+            android:contentDescription="Search stocks" />
+
     </LinearLayout>
 
     <androidx.viewpager2.widget.ViewPager2
