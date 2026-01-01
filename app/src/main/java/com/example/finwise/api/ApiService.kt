@@ -418,6 +418,13 @@ interface ApiService {
 
     @GET("api/crypto/top-gainers")
     suspend fun getCryptoGainers(): CryptoListResponse
+
+    // --- Separate Stock Markets ---
+    @GET("api/market/stocks/us")
+    suspend fun getUsStocks(): StockListResponse
+
+    @GET("api/market/stocks/in")
+    suspend fun getIndianStocks(): StockListResponse
 }
 
 // ============================================================================

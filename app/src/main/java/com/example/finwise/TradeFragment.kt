@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -18,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.finwise.api.MarketIndex
 import com.example.finwise.api.RetrofitClient
+import com.example.finwise.api.StockItem
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -33,11 +33,12 @@ class TradeFragment : Fragment() {
 
     // UI Components - Tabs
     private lateinit var tabLayout: TabLayout
-    private lateinit var stocksTabContent: LinearLayout
-    private lateinit var cryptoTabContent: LinearLayout
-    private lateinit var portfolioTabContent: LinearLayout
+    private lateinit var stocksTabContent: LinearLayout      // Tab 0: Indian Stocks
+    private lateinit var usStocksTabContent: LinearLayout    // Tab 1: US Stocks
+    private lateinit var cryptoTabContent: LinearLayout      // Tab 2: Crypto
+    private lateinit var portfolioTabContent: LinearLayout   // Tab 3: Portfolio
 
-    // Stocks Tab
+    // Indian Stocks Tab
     private lateinit var tvWalletBalance: TextView
     private lateinit var btnInvestNow: TextView
     private lateinit var marketIndicesLayout: LinearLayout
@@ -46,6 +47,18 @@ class TradeFragment : Fragment() {
     private lateinit var chipTopLosers: TextView
     private lateinit var rvStocks: RecyclerView
     private lateinit var shimmerStocks: ShimmerFrameLayout
+
+    // US Stocks Tab (Full Dashboard)
+    private lateinit var tvUsPortfolioValue: TextView
+    private lateinit var btnUsInvestNow: TextView
+    private lateinit var tvUsHoldingsCount: TextView
+    private lateinit var tvUsExchangeRate: TextView
+    private lateinit var tvUsGainersCount: TextView
+    private lateinit var tvUsLosersCount: TextView
+    private lateinit var rvUsGainers: RecyclerView
+    private lateinit var rvUsLosers: RecyclerView
+    private lateinit var rvUsStocks: RecyclerView
+    private lateinit var shimmerUsStocks: ShimmerFrameLayout
 
     // Crypto Tab
     private lateinit var rvCrypto: RecyclerView
@@ -68,12 +81,16 @@ class TradeFragment : Fragment() {
     private lateinit var loadingOverlay: FrameLayout
 
     // Adapters
-    private lateinit var stockCardAdapter: StockCardAdapter
+    private lateinit var indianStockAdapter: StockCardAdapter
+    private lateinit var usStockAdapter: UsStockCardAdapter
+    private lateinit var usGainersAdapter: UsHorizontalStockAdapter
+    private lateinit var usLosersAdapter: UsHorizontalStockAdapter
     private lateinit var cryptoCardAdapter: CryptoCardAdapter
     private lateinit var holdingsAdapter: HoldingsAdapter
 
     private var userEmail: String? = null
     private val rupeeFormat = NumberFormat.getCurrencyInstance(Locale("en", "IN"))
+    private val dollarFormat = NumberFormat.getCurrencyInstance(Locale.US)
     private var currentCategory = "explore"
 
     override fun onCreateView(
@@ -93,9 +110,9 @@ class TradeFragment : Fragment() {
         setupAdapters()
         setupListeners()
 
-        // Load initial data
+        // Load initial data for Tab 0 (Indian Stocks)
         loadMarketIndices()
-        loadStocks("explore")
+        loadIndianStocks("explore")
         loadWalletBalance()
     }
 
@@ -104,7 +121,8 @@ class TradeFragment : Fragment() {
         if (::tabLayout.isInitialized) {
             when (tabLayout.selectedTabPosition) {
                 0 -> loadWalletBalance()
-                2 -> loadPortfolio()
+                1 -> loadUsStocksDashboard()
+                3 -> loadPortfolio()
             }
         }
     }
@@ -113,10 +131,11 @@ class TradeFragment : Fragment() {
         // Tabs
         tabLayout = view.findViewById(R.id.tabLayout)
         stocksTabContent = view.findViewById(R.id.stocksTabContent)
+        usStocksTabContent = view.findViewById(R.id.usStocksTabContent)
         cryptoTabContent = view.findViewById(R.id.cryptoTabContent)
         portfolioTabContent = view.findViewById(R.id.portfolioTabContent)
 
-        // Stocks Tab
+        // Indian Stocks Tab
         tvWalletBalance = view.findViewById(R.id.tvWalletBalance)
         btnInvestNow = view.findViewById(R.id.btnInvestNow)
         marketIndicesLayout = view.findViewById(R.id.marketIndicesLayout)
@@ -125,6 +144,18 @@ class TradeFragment : Fragment() {
         chipTopLosers = view.findViewById(R.id.chipTopLosers)
         rvStocks = view.findViewById(R.id.rvStocks)
         shimmerStocks = view.findViewById(R.id.shimmerStocks)
+
+        // US Stocks Tab (Full Dashboard)
+        tvUsPortfolioValue = view.findViewById(R.id.tvUsPortfolioValue)
+        btnUsInvestNow = view.findViewById(R.id.btnUsInvestNow)
+        tvUsHoldingsCount = view.findViewById(R.id.tvUsHoldingsCount)
+        tvUsExchangeRate = view.findViewById(R.id.tvUsExchangeRate)
+        tvUsGainersCount = view.findViewById(R.id.tvUsGainersCount)
+        tvUsLosersCount = view.findViewById(R.id.tvUsLosersCount)
+        rvUsGainers = view.findViewById(R.id.rvUsGainers)
+        rvUsLosers = view.findViewById(R.id.rvUsLosers)
+        rvUsStocks = view.findViewById(R.id.rvUsStocks)
+        shimmerUsStocks = view.findViewById(R.id.shimmerUsStocks)
 
         // Crypto Tab
         rvCrypto = view.findViewById(R.id.rvCrypto)
@@ -148,12 +179,33 @@ class TradeFragment : Fragment() {
     }
 
     private fun setupAdapters() {
-        // Stocks adapter
-        stockCardAdapter = StockCardAdapter(emptyList()) { stock ->
+        // Indian Stocks adapter (price in ₹)
+        indianStockAdapter = StockCardAdapter(emptyList()) { stock ->
             openBuyActivity("${stock.symbol}.NS")
         }
         rvStocks.layoutManager = LinearLayoutManager(context)
-        rvStocks.adapter = stockCardAdapter
+        rvStocks.adapter = indianStockAdapter
+
+        // US Stocks adapter (price in $) - Vertical list
+        usStockAdapter = UsStockCardAdapter(emptyList()) { stock ->
+            openBuyActivity(stock.symbol)  // US stocks don't need suffix
+        }
+        rvUsStocks.layoutManager = LinearLayoutManager(context)
+        rvUsStocks.adapter = usStockAdapter
+
+        // US Gainers adapter (horizontal)
+        usGainersAdapter = UsHorizontalStockAdapter(emptyList()) { stock ->
+            openBuyActivity(stock.symbol)
+        }
+        rvUsGainers.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        rvUsGainers.adapter = usGainersAdapter
+
+        // US Losers adapter (horizontal)
+        usLosersAdapter = UsHorizontalStockAdapter(emptyList()) { stock ->
+            openBuyActivity(stock.symbol)
+        }
+        rvUsLosers.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        rvUsLosers.adapter = usLosersAdapter
 
         // Crypto adapter
         cryptoCardAdapter = CryptoCardAdapter(emptyList()) { crypto ->
@@ -169,13 +221,16 @@ class TradeFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        // Invest Now button
+        // Invest Now button (Indian)
         btnInvestNow.setOnClickListener { openBuyActivity(null) }
+
+        // Invest Now button (US)
+        btnUsInvestNow.setOnClickListener { openBuyActivity(null) }
 
         // FAB
         fabQuickBuy.setOnClickListener { openBuyActivity(null) }
 
-        // Tab switching
+        // Tab switching (4 tabs)
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 when (tab?.position) {
@@ -184,10 +239,14 @@ class TradeFragment : Fragment() {
                         loadWalletBalance()
                     }
                     1 -> {
+                        showTab(usStocksTabContent)
+                        loadUsStocksDashboard()
+                    }
+                    2 -> {
                         showTab(cryptoTabContent)
                         loadCryptos()
                     }
-                    2 -> {
+                    3 -> {
                         showTab(portfolioTabContent)
                         loadPortfolio()
                     }
@@ -197,18 +256,18 @@ class TradeFragment : Fragment() {
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
 
-        // Category chips (TextViews)
+        // Category chips (TextViews) for Indian stocks
         chipExplore.setOnClickListener { 
             selectChip(chipExplore)
-            loadStocks("explore") 
+            loadIndianStocks("explore") 
         }
         chipTopGainers.setOnClickListener { 
             selectChip(chipTopGainers)
-            loadStocks("gainers") 
+            loadIndianStocks("gainers") 
         }
         chipTopLosers.setOnClickListener { 
             selectChip(chipTopLosers)
-            loadStocks("losers") 
+            loadIndianStocks("losers") 
         }
 
         // Portfolio buttons
@@ -233,6 +292,7 @@ class TradeFragment : Fragment() {
 
     private fun showTab(tabToShow: LinearLayout) {
         stocksTabContent.visibility = View.GONE
+        usStocksTabContent.visibility = View.GONE
         cryptoTabContent.visibility = View.GONE
         portfolioTabContent.visibility = View.GONE
         tabToShow.visibility = View.VISIBLE
@@ -247,6 +307,18 @@ class TradeFragment : Fragment() {
             shimmerStocks.stopShimmer()
             shimmerStocks.visibility = View.GONE
             rvStocks.visibility = View.VISIBLE
+        }
+    }
+
+    private fun showUsStocksLoading(show: Boolean) {
+        if (show) {
+            shimmerUsStocks.visibility = View.VISIBLE
+            shimmerUsStocks.startShimmer()
+            rvUsStocks.visibility = View.GONE
+        } else {
+            shimmerUsStocks.stopShimmer()
+            shimmerUsStocks.visibility = View.GONE
+            rvUsStocks.visibility = View.VISIBLE
         }
     }
 
@@ -315,7 +387,10 @@ class TradeFragment : Fragment() {
         }
     }
 
-    private fun loadStocks(category: String) {
+    /**
+     * Load Indian Stocks (Tab 0)
+     */
+    private fun loadIndianStocks(category: String) {
         currentCategory = category
         showStocksLoading(true)
 
@@ -324,24 +399,110 @@ class TradeFragment : Fragment() {
                 val response = when (category) {
                     "gainers" -> RetrofitClient.instance.getTopGainers()
                     "losers" -> RetrofitClient.instance.getTopLosers()
-                    else -> RetrofitClient.instance.getAllStocks()
+                    else -> RetrofitClient.instance.getIndianStocks()
                 }
 
                 withContext(Dispatchers.Main) {
                     if (!isAdded) return@withContext
                     showStocksLoading(false)
-                    stockCardAdapter.updateData(response.stocks)
+                    indianStockAdapter.updateData(response.stocks)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     if (!isAdded) return@withContext
                     showStocksLoading(false)
-                    Toast.makeText(context, "Failed to load stocks", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Failed to load Indian stocks", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
+    /**
+     * Load Full US Stocks Dashboard (Tab 1)
+     * - Fetches all US stocks
+     * - Client-side sorts into Gainers and Losers
+     * - Calculates US portfolio value from holdings
+     */
+    private fun loadUsStocksDashboard() {
+        showUsStocksLoading(true)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Fetch US stocks and portfolio in parallel
+                val usStocksResponse = RetrofitClient.instance.getUsStocks()
+                
+                val email = userEmail
+                var usHoldingsValue = 0.0
+                var usHoldingsCount = 0
+                
+                // Calculate US holdings value if user is logged in
+                if (email != null) {
+                    try {
+                        val portfolio = RetrofitClient.instance.getPortfolio(email)
+                        // Filter holdings that are US stocks (no .NS, .BO suffix)
+                        portfolio.holdings.forEach { holding ->
+                            val isUsStock = !holding.asset_symbol.endsWith(".NS") && 
+                                           !holding.asset_symbol.endsWith(".BO") &&
+                                           !holding.asset_symbol.contains("-USD") &&
+                                           !holding.asset_symbol.contains("-INR")
+                            if (isUsStock && holding.current_value != null) {
+                                usHoldingsValue += holding.current_value
+                                usHoldingsCount++
+                            }
+                        }
+                    } catch (e: Exception) {
+                        // Silently fail portfolio fetch
+                    }
+                }
+
+                val allUsStocks = usStocksResponse.stocks
+                
+                // Client-side sorting: Gainers and Losers
+                val gainers = allUsStocks
+                    .filter { it.is_positive && it.change_percent > 0 }
+                    .sortedByDescending { it.change_percent }
+                    .take(5)
+                
+                val losers = allUsStocks
+                    .filter { !it.is_positive && it.change_percent < 0 }
+                    .sortedBy { it.change_percent }
+                    .take(5)
+
+                withContext(Dispatchers.Main) {
+                    if (!isAdded) return@withContext
+                    showUsStocksLoading(false)
+                    
+                    // Update portfolio card
+                    tvUsPortfolioValue.text = rupeeFormat.format(usHoldingsValue)
+                    tvUsHoldingsCount.text = "$usHoldingsCount stocks"
+                    tvUsExchangeRate.text = "$1 = ₹84.00"  // Could fetch live rate
+                    
+                    // Update gainers/losers counts
+                    if (gainers.isNotEmpty()) {
+                        tvUsGainersCount.text = "${gainers.size} stocks"
+                    }
+                    if (losers.isNotEmpty()) {
+                        tvUsLosersCount.text = "${losers.size} stocks"
+                    }
+                    
+                    // Update adapters
+                    usGainersAdapter.updateData(gainers)
+                    usLosersAdapter.updateData(losers)
+                    usStockAdapter.updateData(allUsStocks)
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    if (!isAdded) return@withContext
+                    showUsStocksLoading(false)
+                    Toast.makeText(context, "Failed to load US stocks", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    /**
+     * Load Cryptos (Tab 2)
+     */
     private fun loadCryptos() {
         showCryptoLoading(true)
 
@@ -364,6 +525,9 @@ class TradeFragment : Fragment() {
         }
     }
 
+    /**
+     * Load Portfolio (Tab 3)
+     */
     private fun loadPortfolio() {
         val email = userEmail ?: return
         loadingOverlay.visibility = View.VISIBLE

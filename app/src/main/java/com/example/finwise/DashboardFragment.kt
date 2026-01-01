@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -16,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
+import java.util.Calendar
 import java.util.Locale
 
 class DashboardFragment : Fragment() {
@@ -31,6 +33,9 @@ class DashboardFragment : Fragment() {
     private lateinit var progressBudget: ProgressBar
     private lateinit var tvNextLesson: TextView
     private lateinit var tvPortfolioValue: TextView
+    // Greeting view
+    private lateinit var tvHeaderGreeting: TextView
+    private lateinit var ivHeaderProfile: ImageView
     
     private var userEmail: String? = null
 
@@ -47,6 +52,13 @@ class DashboardFragment : Fragment() {
         // Get User Email from shared preferences
         val sharedPref = requireActivity().getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
         userEmail = sharedPref.getString("LOGGED_IN_EMAIL", null)
+
+        // Initialize Header Greeting View
+        tvHeaderGreeting = view.findViewById(R.id.tvHeaderGreeting)
+        ivHeaderProfile = view.findViewById(R.id.ivHeaderProfile)
+        
+        // Set up dynamic greeting
+        setupGreeting(sharedPref)
 
         // Initialize Gamification Views
         tvXp = view.findViewById(R.id.tvXp)
@@ -213,5 +225,43 @@ class DashboardFragment : Fragment() {
                 }
             }
         }
+    }
+
+    /**
+     * Sets up the dynamic greeting in the header.
+     * The greeting is personalized based on:
+     * 1. User's name (from SharedPreferences)
+     * 2. Time of day (Morning/Afternoon/Evening)
+     * 3. User activity (shows "Long time no see" if inactive for > 3 days)
+     */
+    private fun setupGreeting(sharedPref: android.content.SharedPreferences) {
+        // Step A: Get Data
+        val userName = sharedPref.getString("USER_NAME", "User") ?: "User"
+        val lastLoginTime = sharedPref.getLong("LAST_LOGIN_TIME", 0L)
+        val currentTime = System.currentTimeMillis()
+        
+        // Step B: Determine Greeting
+        val greeting: String
+        
+        // Priority Check: If more than 3 days since last login
+        val threeDaysInMillis = 3 * 24 * 60 * 60 * 1000L
+        if (lastLoginTime > 0 && (currentTime - lastLoginTime) > threeDaysInMillis) {
+            greeting = "Long time no see, $userName!"
+        } else {
+            // Standard time-based greeting
+            val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+            val timeGreeting = when (hour) {
+                in 0..11 -> "Good Morning"
+                in 12..16 -> "Good Afternoon"
+                else -> "Good Evening" // 17-23
+            }
+            greeting = "$timeGreeting, $userName"
+        }
+        
+        // Step C: Update UI & Save
+        tvHeaderGreeting.text = greeting
+        
+        // Update LAST_LOGIN_TIME to current timestamp
+        sharedPref.edit().putLong("LAST_LOGIN_TIME", currentTime).apply()
     }
 }
