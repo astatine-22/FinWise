@@ -9,6 +9,9 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -54,6 +57,14 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        // Handle status bar insets to prevent overlap
+        val searchHeader = findViewById<LinearLayout>(R.id.searchHeader)
+        ViewCompat.setOnApplyWindowInsetsListener(searchHeader) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
+            view.updatePadding(top = insets.top + 16) // 16dp base padding + status bar height
+            windowInsets
+        }
 
         initializeViews()
         setupAdapters()
