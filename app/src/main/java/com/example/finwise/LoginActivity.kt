@@ -123,7 +123,7 @@ class LoginActivity : AppCompatActivity() {
                     saveSessionAndProceed(
                         token = response.access_token,
                         email = email,
-                        name = response.user?.name
+                        name = response.name ?: response.user?.name  // Prefer root-level name
                     )
                 }
             } catch (e: Exception) {

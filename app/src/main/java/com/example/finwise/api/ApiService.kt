@@ -24,7 +24,9 @@ data class UserProfile(val name: String, val xp: Int, val profile_picture: Strin
 data class TokenResponse(
     val access_token: String,
     val token_type: String = "bearer",
-    val user: UserProfile? = null
+    val user_id: Int? = null,     // Returned from login endpoint
+    val name: String? = null,      // User's name from login
+    val user: UserProfile? = null  // For backward compatibility with Google login
 )
 
 // Legacy response (for backward compatibility)
@@ -275,7 +277,7 @@ interface ApiService {
 
     // --- Auth Routes (now returning JWT tokens) ---
     @POST("api/auth/signup")
-    suspend fun signup(@Body request: SignupRequest): TokenResponse
+    suspend fun signup(@Body request: SignupRequest): SimpleResponse
 
     @POST("api/auth/login")
     suspend fun login(@Body request: LoginRequest): TokenResponse

@@ -94,20 +94,24 @@ class SignupActivity : AppCompatActivity() {
 
     /**
      * Perform standard email/password signup.
-     * On success, saves JWT token and user info.
+     * On success, shows message and automatically logs in the user.
      */
     private fun performStandardSignup(name: String, email: String, pass: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val request = SignupRequest(name, email, pass)
-                val response = RetrofitClient.instance.signup(request)
+                val signupRequest = SignupRequest(name, email, pass)
+                val signupResponse = RetrofitClient.instance.signup(signupRequest)
+                
+                // Signup successful, now auto-login to get JWT token
+                val loginRequest = com.example.finwise.api.LoginRequest(email, pass)
+                val loginResponse = RetrofitClient.instance.login(loginRequest)
                 
                 withContext(Dispatchers.Main) {
                     // Save JWT token and user data
                     saveSessionAndProceed(
-                        token = response.access_token,
+                        token = loginResponse.access_token,
                         email = email,
-                        name = response.user?.name ?: name
+                        name = loginResponse.name ?: name
                     )
                 }
             } catch (e: Exception) {
