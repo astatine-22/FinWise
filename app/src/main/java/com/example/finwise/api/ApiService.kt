@@ -465,10 +465,11 @@ object RetrofitClient {
         }
 
     private fun createApiService(): ApiService {
+        // Extended timeouts for Render cloud cold starts (can take 60+ seconds)
         val okHttpClientBuilder = okhttp3.OkHttpClient.Builder()
-            .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
-            .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
-            .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .connectTimeout(90, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(90, java.util.concurrent.TimeUnit.SECONDS)
+            .writeTimeout(90, java.util.concurrent.TimeUnit.SECONDS)
 
         // Add AuthInterceptor if SessionManager is initialized
         sessionManager?.let { sm ->

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -35,7 +34,6 @@ class DashboardFragment : Fragment() {
     private lateinit var tvPortfolioValue: TextView
     // Greeting view
     private lateinit var tvHeaderGreeting: TextView
-    private lateinit var ivHeaderProfile: ImageView
     
     private var userEmail: String? = null
 
@@ -55,7 +53,6 @@ class DashboardFragment : Fragment() {
 
         // Initialize Header Greeting View
         tvHeaderGreeting = view.findViewById(R.id.tvHeaderGreeting)
-        ivHeaderProfile = view.findViewById(R.id.ivHeaderProfile)
         
         // Set up dynamic greeting
         setupGreeting(sharedPref)

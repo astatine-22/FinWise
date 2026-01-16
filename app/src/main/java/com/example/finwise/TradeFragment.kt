@@ -24,6 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
@@ -428,8 +429,15 @@ class TradeFragment : Fragment() {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // Fetch US stocks and portfolio in parallel
-                val usStocksResponse = RetrofitClient.instance.getUsStocks()
+                // Fetch US stocks and crypto data in parallel to get the live exchange rate
+                val usStocksDeferred = async { RetrofitClient.instance.getUsStocks() }
+                val cryptoDeferred = async { RetrofitClient.instance.getCryptoList() }
+                
+                val usStocksResponse = usStocksDeferred.await()
+                val cryptoResponse = cryptoDeferred.await()
+                
+                // Extract live USD to INR rate
+                val liveExchangeRate = cryptoResponse.usd_to_inr
                 
                 val email = userEmail
                 var usHoldingsValue = 0.0
@@ -475,7 +483,7 @@ class TradeFragment : Fragment() {
                     // Update portfolio card
                     tvUsPortfolioValue.text = rupeeFormat.format(usHoldingsValue)
                     tvUsHoldingsCount.text = "$usHoldingsCount stocks"
-                    tvUsExchangeRate.text = "$1 = ₹84.00"  // Could fetch live rate
+                    tvUsExchangeRate.text = "$1 = ₹${String.format("%.2f", liveExchangeRate)}"
                     
                     // Update gainers/losers counts
                     if (gainers.isNotEmpty()) {
