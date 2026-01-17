@@ -114,6 +114,23 @@ class SignupActivity : AppCompatActivity() {
                         name = loginResponse.name ?: name
                     )
                 }
+            } catch (e: retrofit2.HttpException) {
+                // Parse the error body to get the specific error message from backend
+                val errorMessage = try {
+                    val errorBody = e.response()?.errorBody()?.string()
+                    if (errorBody != null) {
+                        val json = org.json.JSONObject(errorBody)
+                        json.optString("detail", "Signup Failed")
+                    } else {
+                        "Signup Failed"
+                    }
+                } catch (parseException: Exception) {
+                    "Signup Failed: ${e.message}"
+                }
+                
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@SignupActivity, errorMessage, Toast.LENGTH_LONG).show()
+                }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@SignupActivity, "Signup Failed: ${e.message}", Toast.LENGTH_LONG).show()

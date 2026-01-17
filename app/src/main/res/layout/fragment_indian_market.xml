@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:clipToPadding="false"
+    android:paddingBottom="80dp"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Total Balance Card (Green Gradient) -->
+        <LinearLayout
+            android:id="@+id/walletHeroCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_balance_card_green"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total Balance"
+                android:textColor="#FFFFFFCC"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/tvWalletBalance"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="₹74,999.20"
+                    android:textColor="#FFFFFF"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnInvestNow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_button_invest_now"
+                    android:gravity="center"
+                    android:paddingHorizontal="20dp"
+                    android:text="Invest Now"
+                    android:textColor="#22C55E"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Market Overview Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:text="Market Overview"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#1F2937" />
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:scrollbars="none"
+            android:clipToPadding="false"
+            android:paddingHorizontal="16dp">
+
+            <LinearLayout
+                android:id="@+id/marketIndicesLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
+        <!-- Category Chips -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:paddingHorizontal="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/chipExplore"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_chip_selected"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:text="Explore"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/chipTopGainers"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/bg_chip_unselected"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:text="Top Gainers"
+                android:textColor="#6B7280"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/chipTopLosers"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/bg_chip_unselected"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:text="Top Losers"
+                android:textColor="#6B7280"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- Stocks List -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvStocks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmerStocks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/layout_shimmer_stock_placeholder" />
+                    <include layout="@layout/layout_shimmer_stock_placeholder" />
+                    <include layout="@layout/layout_shimmer_stock_placeholder" />
+                    <include layout="@layout/layout_shimmer_stock_placeholder" />
+                </LinearLayout>
+            </com.facebook.shimmer.ShimmerFrameLayout>
+        </FrameLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
