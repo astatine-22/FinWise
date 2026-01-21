@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
+    android:background="@color/background_light">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,8 +21,7 @@
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@color/black"
-            tools:text="Good Morning, User" />
-
+            tools:text="@string/dashboard_greeting_default" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -47,12 +46,12 @@
                     android:orientation="vertical"
                     android:padding="12dp"
                     android:background="@color/white">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="XP Points" android:textSize="12sp" android:textColor="#757575"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/xp_points_label" android:textSize="12sp" android:textColor="@color/text_subtitle"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
-                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_star" app:tint="#FFC107"/>
+                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_star" app:tint="@color/xp_star_color"/>
                         <TextView android:id="@+id/tvXp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textStyle="bold" android:textSize="16sp" android:textColor="@color/black" android:layout_marginStart="4dp"/>
                     </LinearLayout>
-                    <TextView android:id="@+id/tvLevelTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Novice" android:textSize="10sp" android:textColor="#4CAF50" android:layout_marginTop="2dp"/>
+                    <TextView android:id="@+id/tvLevelTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/level_novice" android:textSize="10sp" android:textColor="@color/xp_text_color" android:layout_marginTop="2dp"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -72,9 +71,9 @@
                     android:orientation="vertical"
                     android:padding="12dp"
                     android:background="@color/white">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Badges" android:textSize="12sp" android:textColor="#757575"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/badges_label" android:textSize="12sp" android:textColor="@color/text_subtitle"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
-                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_badge" app:tint="#FF7043"/>
+                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_badge" app:tint="@color/badge_color"/>
                         <TextView android:id="@+id/tvBadgesCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textStyle="bold" android:textSize="16sp" android:textColor="@color/black" android:layout_marginStart="4dp"/>
                     </LinearLayout>
                 </LinearLayout>
@@ -95,10 +94,10 @@
                     android:orientation="vertical"
                     android:padding="12dp"
                     android:background="@color/white">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🔥 Streak" android:textSize="12sp" android:textColor="#757575"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/streak_label" android:textSize="12sp" android:textColor="@color/text_subtitle"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
                         <TextView android:id="@+id/tvStreak" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textStyle="bold" android:textSize="16sp" android:textColor="@color/black"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" days" android:textSize="12sp" android:textColor="#757575"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/days_suffix" android:textSize="12sp" android:textColor="@color/text_subtitle"/>
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -120,15 +119,15 @@
                 android:padding="20dp">
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_wallet" app:tint="#2E7D32"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Budget Tracker" android:textStyle="bold" android:textSize="18sp" android:textColor="#1B5E20" android:layout_marginStart="12dp"/>
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_wallet" app:tint="@color/budget_icon_tint"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/budget_tracker_title" android:textStyle="bold" android:textSize="18sp" android:textColor="@color/budget_title_text" android:layout_marginStart="12dp"/>
                 </LinearLayout>
 
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="See where your money goes." android:textSize="14sp" android:textColor="#558B2F" android:layout_marginTop="4dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/budget_tracker_subtitle" android:textSize="14sp" android:textColor="@color/budget_subtitle_text" android:layout_marginTop="4dp"/>
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="16dp">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:text="Monthly Budget" android:textSize="12sp" android:textColor="#333333" android:layout_weight="1"/>
-                    <TextView android:id="@+id/tvBudgetPercent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Loading..." android:textStyle="bold" android:textSize="12sp" android:textColor="#333333"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/monthly_budget_label" android:textSize="12sp" android:textColor="@color/text_dark_gray" android:layout_weight="1"/>
+                    <TextView android:id="@+id/tvBudgetPercent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/loading_text" android:textStyle="bold" android:textSize="12sp" android:textColor="@color/text_dark_gray"/>
                 </LinearLayout>
 
                 <ProgressBar
@@ -158,17 +157,17 @@
                 android:padding="20dp">
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_school" app:tint="#E65100"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Learn" android:textStyle="bold" android:textSize="18sp" android:textColor="#E65100" android:layout_marginStart="12dp"/>
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_school" app:tint="@color/learn_orange"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/learn_title" android:textStyle="bold" android:textSize="18sp" android:textColor="@color/learn_orange" android:layout_marginStart="12dp"/>
                 </LinearLayout>
 
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Boost your financial IQ." android:textSize="14sp" android:textColor="#EF6C00" android:layout_marginTop="4dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/learn_subtitle" android:textSize="14sp" android:textColor="@color/learn_subtitle_text" android:layout_marginTop="4dp"/>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FFE0B2" android:layout_marginTop="12dp" android:layout_marginBottom="12dp"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/learn_divider" android:layout_marginTop="12dp" android:layout_marginBottom="12dp"/>
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-                    <TextView android:id="@+id/tvNextLesson" android:layout_width="0dp" android:layout_height="wrap_content" android:text="Loading..." android:textStyle="bold" android:textColor="#E65100" android:layout_weight="1"/>
-                    <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_eye" app:tint="#E65100"/>
+                    <TextView android:id="@+id/tvNextLesson" android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/loading_text" android:textStyle="bold" android:textColor="@color/learn_orange" android:layout_weight="1"/>
+                    <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_eye" app:tint="@color/learn_orange"/>
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -179,7 +178,7 @@
             android:layout_height="wrap_content"
             app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
-            app:cardBackgroundColor="#F3E5F5"
+            app:cardBackgroundColor="@color/card_goals_bg"
             android:layout_marginBottom="16dp">
 
             <LinearLayout
@@ -189,15 +188,15 @@
                 android:padding="20dp">
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_nav_goals" app:tint="#8E24AA"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Savings Goals" android:textStyle="bold" android:textSize="18sp" android:textColor="#8E24AA" android:layout_marginStart="12dp"/>
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_nav_goals" app:tint="@color/goals_purple"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/savings_goals_title" android:textStyle="bold" android:textSize="18sp" android:textColor="@color/goals_purple" android:layout_marginStart="12dp"/>
                 </LinearLayout>
 
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Get closer to your dreams." android:textSize="14sp" android:textColor="#BA68C8" android:layout_marginTop="4dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/savings_goals_subtitle" android:textSize="14sp" android:textColor="@color/goals_subtitle_text" android:layout_marginTop="4dp"/>
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="16dp">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:text="New Car Fund" android:textSize="14sp" android:textColor="#8E24AA" android:layout_weight="1"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="₹1,500 / ₹5,000" android:textStyle="bold" android:textSize="14sp" android:textColor="#8E24AA"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/new_car_fund_example" android:textSize="14sp" android:textColor="@color/goals_purple" android:layout_weight="1"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/savings_goal_example_amount" android:textStyle="bold" android:textSize="14sp" android:textColor="@color/goals_purple"/>
                 </LinearLayout>
 
                 <ProgressBar
@@ -205,8 +204,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="8dp"
                     android:progress="30"
-                    android:progressTint="#8E24AA"
-                    android:progressBackgroundTint="#E1BEE7"
+                    android:progressTint="@color/goals_purple"
+                    android:progressBackgroundTint="@color/goals_progress_bg"
                     android:layout_marginTop="8dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -226,15 +225,15 @@
                 android:padding="20dp">
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_chart" app:tint="#0D47A1"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Paper Trading" android:textStyle="bold" android:textSize="18sp" android:textColor="#0D47A1" android:layout_marginStart="12dp"/>
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_chart" app:tint="@color/trading_blue"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/paper_trading_title" android:textStyle="bold" android:textSize="18sp" android:textColor="@color/trading_blue" android:layout_marginStart="12dp"/>
                 </LinearLayout>
 
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Practice investing risk-free." android:textSize="14sp" android:textColor="#1565C0" android:layout_marginTop="4dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/paper_trading_subtitle" android:textSize="14sp" android:textColor="@color/trading_subtitle_text" android:layout_marginTop="4dp"/>
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="16dp">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:text="Portfolio Value" android:textSize="14sp" android:textColor="#333333" android:layout_weight="1"/>
-                    <TextView android:id="@+id/tvPortfolioValue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Loading..." android:textStyle="bold" android:textColor="@color/text_gain_green"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/portfolio_value_label" android:textSize="14sp" android:textColor="@color/text_dark_gray" android:layout_weight="1"/>
+                    <TextView android:id="@+id/tvPortfolioValue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/loading_text" android:textStyle="bold" android:textColor="@color/text_gain_green"/>
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -247,7 +246,7 @@
             android:layout_marginTop="16dp"
             app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
-            app:cardBackgroundColor="#FFF8E1">
+            app:cardBackgroundColor="@color/hall_of_fame_bg">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -259,7 +258,7 @@
                 <TextView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:text="🏆"
+                    android:text="@string/hall_of_fame_emoji"
                     android:textSize="32sp"
                     android:gravity="center"/>
 
@@ -273,17 +272,17 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Hall of Fame"
+                        android:text="@string/hall_of_fame_title"
                         android:textStyle="bold"
                         android:textSize="18sp"
-                        android:textColor="#FF6F00"/>
+                        android:textColor="@color/hall_of_fame_text"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="See the top XP earners!"
+                        android:text="@string/hall_of_fame_subtitle"
                         android:textSize="14sp"
-                        android:textColor="#FFA000"
+                        android:textColor="@color/hall_of_fame_subtitle"
                         android:layout_marginTop="2dp"/>
                 </LinearLayout>
 
@@ -291,7 +290,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_chevron_right"
-                    app:tint="#FF6F00"/>
+                    app:tint="@color/hall_of_fame_text"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
