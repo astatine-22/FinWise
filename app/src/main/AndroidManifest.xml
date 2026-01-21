@@ -38,6 +38,9 @@
             android:name=".SearchActivity"
             android:exported="false" />
         <activity
+            android:name=".LessonDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".BudgetActivity"
             android:exported="false" />
         <activity

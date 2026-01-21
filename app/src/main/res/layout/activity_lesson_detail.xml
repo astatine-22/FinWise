@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <!-- WebView for YouTube Video -->
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="250dp" />
+
+    <!-- Lesson Title -->
+    <TextView
+        android:id="@+id/tvLessonTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Stock Market Basics"
+        android:textColor="@color/text_title"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:padding="16dp" />
+
+    <!-- Lesson Description -->
+    <TextView
+        android:id="@+id/tvLessonDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Learn the fundamentals of stock market investing"
+        android:textColor="@color/text_subtitle"
+        android:textSize="14sp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp" />
+</LinearLayout>

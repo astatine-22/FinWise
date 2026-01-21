@@ -1,36 +1,18 @@
 package com.example.finwise
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.finwise.api.LearnVideoResponse
-import com.example.finwise.api.RetrofitClient
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class LearnFragment : Fragment() {
 
-    private lateinit var rvVideos: RecyclerView
-    private lateinit var progressBar: ProgressBar
-    private lateinit var emptyStateLayout: LinearLayout
-    private lateinit var chipGroupCategories: ChipGroup
-    private lateinit var adapter: LearnVideosAdapter
-
-    private var allVideos: List<LearnVideoResponse> = emptyList()
-    private var selectedCategory: String? = null
+    private lateinit var rvLessons: RecyclerView
+    private lateinit var adapter: LessonAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,132 +26,67 @@ class LearnFragment : Fragment() {
 
         initializeViews(view)
         setupRecyclerView()
-        setupChipGroup()
-        loadVideos()
+        loadDemoLessons()
     }
 
     private fun initializeViews(view: View) {
-        rvVideos = view.findViewById(R.id.rvVideos)
-        progressBar = view.findViewById(R.id.progressBar)
-        emptyStateLayout = view.findViewById(R.id.emptyStateLayout)
-        chipGroupCategories = view.findViewById(R.id.chipGroupCategories)
+        rvLessons = view.findViewById(R.id.rvVideos)
     }
 
     private fun setupRecyclerView() {
-        adapter = LearnVideosAdapter(emptyList()) { video ->
-            openYouTubeVideo(video.youtube_video_id)
+        adapter = LessonAdapter(getDemoLessons()) { lesson ->
+            openLessonDetail(lesson)
         }
-        rvVideos.layoutManager = LinearLayoutManager(context)
-        rvVideos.adapter = adapter
+        rvLessons.layoutManager = LinearLayoutManager(context)
+        rvLessons.adapter = adapter
     }
 
-    private fun setupChipGroup() {
-        chipGroupCategories.setOnCheckedStateChangeListener { _, checkedIds ->
-            if (checkedIds.isEmpty()) {
-                // "All" is unselected, show all videos
-                selectedCategory = null
-                filterVideos()
-            } else {
-                val chipId = checkedIds[0]
-                val chip = chipGroupCategories.findViewById<Chip>(chipId)
-                val category = chip?.text?.toString()
-                
-                if (category == "All") {
-                    selectedCategory = null
-                } else {
-                    selectedCategory = category
-                }
-                filterVideos()
-            }
-        }
+    private fun loadDemoLessons() {
+        // Data is already loaded from getDemoLessons()
+        // No API calls needed for demo data
     }
 
-    private fun loadVideos() {
-        progressBar.visibility = View.VISIBLE
-        rvVideos.visibility = View.GONE
-        emptyStateLayout.visibility = View.GONE
-
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val videos = RetrofitClient.instance.getLearnVideos()
-                val categories = videos.map { it.category }.distinct()
-
-                withContext(Dispatchers.Main) {
-                    if (!isAdded) return@withContext
-
-                    allVideos = videos
-                    progressBar.visibility = View.GONE
-
-                    // Add category chips dynamically
-                    addCategoryChips(categories)
-
-                    if (videos.isEmpty()) {
-                        emptyStateLayout.visibility = View.VISIBLE
-                        rvVideos.visibility = View.GONE
-                    } else {
-                        emptyStateLayout.visibility = View.GONE
-                        rvVideos.visibility = View.VISIBLE
-                        adapter.updateData(videos)
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    if (!isAdded) return@withContext
-                    progressBar.visibility = View.GONE
-                    emptyStateLayout.visibility = View.VISIBLE
-                    rvVideos.visibility = View.GONE
-                    Toast.makeText(context, "Failed to load videos: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
+    private fun getDemoLessons(): List<Lesson> {
+        return listOf(
+            Lesson(
+                title = "Stock Market Basics",
+                subtitle = "Investing 101",
+                xp = "50",
+                videoUrl = "https://www.youtube.com/embed/p7HKvqRI_Bo"
+            ),
+            Lesson(
+                title = "Crypto for Beginners",
+                subtitle = "Blockchain 101",
+                xp = "100",
+                videoUrl = "https://www.youtube.com/embed/Yb6825iv0Vk"
+            ),
+            Lesson(
+                title = "How to Budget",
+                subtitle = "Personal Finance",
+                xp = "75",
+                videoUrl = "https://www.youtube.com/embed/HQzoZfc3GwQ"
+            ),
+            Lesson(
+                title = "Understanding Mutual Funds",
+                subtitle = "Investment Strategies",
+                xp = "60",
+                videoUrl = "https://www.youtube.com/embed/dFj9UKsN5j4"
+            ),
+            Lesson(
+                title = "Passive Income Strategies",
+                subtitle = "Building Wealth",
+                xp = "80",
+                videoUrl = "https://www.youtube.com/embed/mQehUDW6jKA"
+            )
+        )
     }
 
-    private fun addCategoryChips(categories: List<String>) {
-        // Remove all chips except "All"
-        val chipAll = chipGroupCategories.findViewById<Chip>(R.id.chipAll)
-        chipGroupCategories.removeAllViews()
-        chipGroupCategories.addView(chipAll)
-
-        // Add category chips
-        categories.forEach { category ->
-            val chip = Chip(requireContext()).apply {
-                text = category
-                isCheckable = true
-                isCheckedIconVisible = false
-                setChipBackgroundColorResource(R.color.chip_background_selector)
-            }
-            chipGroupCategories.addView(chip)
+    private fun openLessonDetail(lesson: Lesson) {
+        val intent = Intent(requireContext(), LessonDetailActivity::class.java).apply {
+            putExtra("VIDEO_URL", lesson.videoUrl)
+            putExtra("TITLE", lesson.title)
+            putExtra("SUBTITLE", lesson.subtitle)
         }
-    }
-
-    private fun filterVideos() {
-        val filteredVideos = if (selectedCategory == null) {
-            allVideos
-        } else {
-            allVideos.filter { it.category == selectedCategory }
-        }
-
-        if (filteredVideos.isEmpty()) {
-            emptyStateLayout.visibility = View.VISIBLE
-            rvVideos.visibility = View.GONE
-        } else {
-            emptyStateLayout.visibility = View.GONE
-            rvVideos.visibility = View.VISIBLE
-        }
-        
-        adapter.updateData(filteredVideos)
-    }
-
-    private fun openYouTubeVideo(videoId: String) {
-        // Try to open in YouTube app first
-        val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
-        val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=$videoId"))
-
-        try {
-            startActivity(appIntent)
-        } catch (e: Exception) {
-            // YouTube app not installed, open in browser
-            startActivity(webIntent)
-        }
+        startActivity(intent)
     }
 }
