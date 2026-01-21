@@ -55,4 +55,26 @@
     <!-- Semantic colors -->
     <color name="colorPositiveGreen">#22C55E</color>
     <color name="colorNegativeRed">#EF4444</color>
+
+    <!-- Extracted Colors -->
+    <color name="background_light">#F8F9FA</color>
+    <color name="divider_color">#E0E0E0</color>
+    <color name="xp_star_color">#FFC107</color>
+    <color name="xp_text_color">#4CAF50</color>
+    <color name="badge_color">#FF7043</color>
+    <color name="budget_icon_tint">#2E7D32</color>
+    <color name="budget_title_text">#1B5E20</color>
+    <color name="budget_subtitle_text">#558B2F</color>
+    <color name="text_dark_gray">#333333</color>
+    <color name="learn_orange">#E65100</color>
+    <color name="learn_subtitle_text">#EF6C00</color>
+    <color name="learn_divider">#FFE0B2</color>
+    <color name="goals_purple">#8E24AA</color>
+    <color name="goals_subtitle_text">#BA68C8</color>
+    <color name="goals_progress_bg">#E1BEE7</color>
+    <color name="trading_blue">#0D47A1</color>
+    <color name="trading_subtitle_text">#1565C0</color>
+    <color name="hall_of_fame_bg">#FFF8E1</color>
+    <color name="hall_of_fame_text">#FF6F00</color>
+    <color name="hall_of_fame_subtitle">#FFA000</color>
 </resources>
