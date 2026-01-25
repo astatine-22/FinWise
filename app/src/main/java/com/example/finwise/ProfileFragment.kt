@@ -20,6 +20,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -29,6 +30,7 @@ import com.example.finwise.api.ProfilePictureUpdate
 import com.example.finwise.api.RetrofitClient
 import com.example.finwise.data.ServiceLocator
 import com.example.finwise.data.local.entity.LocalUser
+import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -48,7 +50,7 @@ class ProfileFragment : Fragment() {
     private lateinit var tvBadges: TextView
     private lateinit var tvModules: TextView
     private lateinit var btnEditProfile: LinearLayout
-    private lateinit var btnSettings: LinearLayout
+    private lateinit var switchDarkMode: SwitchMaterial
     private lateinit var btnLogout: TextView
 
     private var userEmail: String? = null
@@ -98,8 +100,11 @@ class ProfileFragment : Fragment() {
         tvBadges = view.findViewById(R.id.tvBadges)
         tvModules = view.findViewById(R.id.tvModules)
         btnEditProfile = view.findViewById(R.id.btnEditProfile)
-        btnSettings = view.findViewById(R.id.btnSettings)
+        switchDarkMode = view.findViewById(R.id.switchDarkMode)
         btnLogout = view.findViewById(R.id.btnLogout)
+
+        // Load and set dark mode state
+        loadDarkModeState()
 
         // Set user handle from email
         userEmail?.let {
@@ -115,6 +120,11 @@ class ProfileFragment : Fragment() {
 
         // STEP 3: Trigger background API refresh
         userEmail?.let { refreshFromApi(it) }
+
+        // ========== FETCH PROFILE PICTURE DIRECTLY FROM API ==========
+        // This bypasses Room database and gets the latest profile picture immediately
+        userEmail?.let { fetchProfilePicture(it) }
+        // =============================================================
 
         // Setup click listeners
         setupClickListeners()
@@ -185,13 +195,14 @@ class ProfileFragment : Fragment() {
     
     /**
      * Save user data to SharedPreferences for immediate fallback on next launch.
+     * Note: Profile picture is NOT saved here - we rely on Room database and live URL.
      */
     private fun saveToSharedPrefs(user: LocalUser) {
         val sharedPref = requireActivity().getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
         sharedPref.edit()
             .putString("USER_NAME", user.displayName)
             .putInt("USER_XP", user.xp)
-            .putString("PROFILE_PICTURE", user.profilePicture)
+            // Removed: .putString("PROFILE_PICTURE", user.profilePicture)
             .apply()
     }
 
@@ -208,16 +219,38 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    /**
+     * Fetch profile picture directly from API (bypassing Room database).
+     * This is the same approach used in MainActivity that works reliably.
+     */
+    private fun fetchProfilePicture(email: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val userProfile = RetrofitClient.instance.getUserDetails(email)
+                withContext(Dispatchers.Main) {
+                    loadProfilePicture(userProfile.profile_picture)
+                }
+            } catch (e: Exception) {
+                Log.e("ProfileFragment", "Failed to fetch profile picture: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Load profile picture from Base64 string.
+     * Uses the same simple logic as MainActivity.
+     */
     private fun loadProfilePicture(base64Image: String?) {
         if (base64Image != null && base64Image.isNotEmpty()) {
             try {
                 val imageBytes = Base64.decode(base64Image, Base64.DEFAULT)
                 val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                 ivProfileAvatar.setImageBitmap(bitmap)
+                ivProfileAvatar.scaleType = ImageView.ScaleType.CENTER_CROP
                 ivProfileAvatar.setPadding(0, 0, 0, 0)
                 ivProfileAvatar.imageTintList = null
             } catch (e: Exception) {
-                // If decoding fails, keep the default icon
+                Log.e("ProfileFragment", "Failed to load profile picture: ${e.message}")
             }
         }
     }
@@ -331,9 +364,22 @@ class ProfileFragment : Fragment() {
             requireActivity().finish()
         }
 
-        // More options button
-        btnMore.setOnClickListener {
-            Toast.makeText(requireContext(), "More options coming soon!", Toast.LENGTH_SHORT).show()
+        // More options button - Show popup menu
+        btnMore.setOnClickListener { view ->
+            val popupMenu = androidx.appcompat.widget.PopupMenu(requireContext(), view)
+            popupMenu.menuInflater.inflate(R.menu.menu_profile_options, popupMenu.menu)
+            
+            popupMenu.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.action_faq -> {
+                        showFaqDialog()
+                        true
+                    }
+                    else -> false
+                }
+            }
+            
+            popupMenu.show()
         }
 
         // Profile Avatar - Open image picker
@@ -353,9 +399,15 @@ class ProfileFragment : Fragment() {
             startActivity(intent)
         }
 
-        // Settings
-        btnSettings.setOnClickListener {
-            Toast.makeText(requireContext(), "Settings coming soon!", Toast.LENGTH_SHORT).show()
+        // Dark Mode Toggle
+        switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                saveDarkModePreference(true)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                saveDarkModePreference(false)
+            }
         }
 
         // Logout
@@ -385,5 +437,47 @@ class ProfileFragment : Fragment() {
 
         // Finish current activity
         requireActivity().finish()
+    }
+
+    private fun loadDarkModeState() {
+        val sharedPref = requireActivity().getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
+        val isDarkMode = sharedPref.getBoolean("DARK_MODE", false)
+        switchDarkMode.isChecked = isDarkMode
+        
+        // Apply the saved theme
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+    }
+
+    private fun saveDarkModePreference(isDarkMode: Boolean) {
+        val sharedPref = requireActivity().getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
+        sharedPref.edit().putBoolean("DARK_MODE", isDarkMode).apply()
+    }
+
+    /**
+     * Show FAQ dialog with common questions and answers
+     */
+    private fun showFaqDialog() {
+        val faqMessage = """
+            Q: What is FinWise?
+            A: FinWise is your personal finance companion for tracking expenses and learning about trading.
+            
+            Q: Is my data safe?
+            A: Yes, your data is stored locally on your device and securely on our servers.
+            
+            Q: How do I earn XP?
+            A: Complete lessons and maintain your daily streak to earn XP and badges.
+        """.trimIndent()
+        
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Frequently Asked Questions")
+            .setMessage(faqMessage)
+            .setPositiveButton("Close") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 }

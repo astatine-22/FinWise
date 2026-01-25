@@ -7,8 +7,8 @@
     android:layout_height="wrap_content"
     app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
-    app:cardBackgroundColor="@android:color/white"
-    app:strokeColor="#F0F0F0"
+    app:cardBackgroundColor="@color/card_budget_bg"
+    app:strokeColor="@color/divider_color"
     app:strokeWidth="1dp"
     android:layout_marginBottom="12dp"
     android:clickable="true"
@@ -55,7 +55,7 @@
                 android:text="Expense Title"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#333333"
+                android:textColor="@color/text_title"
                 android:maxLines="1"
                 android:ellipsize="end"/>
 
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:text="Oct 27"
                 android:textSize="14sp"
-                android:textColor="#757575"
+                android:textColor="@color/text_subtitle"
                 android:layout_marginTop="4dp"/>
         </LinearLayout>
 
@@ -76,7 +76,7 @@
             android:text="-₹0.00"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#333333"
+            android:textColor="@color/text_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>

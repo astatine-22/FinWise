@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="RELIANCE"
-            android:textColor="#1F2937"
+            android:textColor="@color/text_title"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Reliance Industries Ltd."
-            android:textColor="#6B7280"
+            android:textColor="@color/text_subtitle"
             android:textSize="13sp"
             android:maxLines="1"
             android:ellipsize="end"
@@ -65,7 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="NSE/BSE"
-        android:textColor="#6B7280"
+        android:textColor="@color/text_subtitle"
         android:textSize="11sp"
         android:background="@drawable/bg_exchange_badge"
         android:paddingHorizontal="8dp"

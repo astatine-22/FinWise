@@ -6,7 +6,7 @@
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
-    app:cardBackgroundColor="#FFFFFF">
+    app:cardBackgroundColor="@color/card_budget_bg">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -45,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="RELIANCE.NS"
-                android:textColor="#333333"
+                android:textColor="@color/text_title"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -60,14 +60,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="5 shares"
-                    android:textColor="#757575"
+                    android:textColor="@color/text_subtitle"
                     android:textSize="12sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=" • "
-                    android:textColor="#BDBDBD"
+                    android:textColor="@color/text_subtitle"
                     android:textSize="12sp" />
 
                 <TextView
@@ -75,7 +75,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Avg: ₹2,500.00"
-                    android:textColor="#757575"
+                    android:textColor="@color/text_subtitle"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
@@ -92,7 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="₹12,750.00"
-                android:textColor="#333333"
+                android:textColor="@color/text_title"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 

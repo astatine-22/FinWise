@@ -79,4 +79,8 @@ dependencies {
 
     // Shimmer Loading Effect
     implementation("com.facebook.shimmer:shimmer:0.5.0")
+
+    // Glide - Image Loading (for Google profile picture URLs)
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    ksp("com.github.bumptech.glide:compiler:4.16.0")
 }

@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvScreenTitle: TextView
     private lateinit var ivProfile: ImageView
     private lateinit var btnSearch: ImageView
+    private lateinit var fabMainAdd: FloatingActionButton
     private var userEmail: String? = null
 
     // Screen titles for each tab
@@ -39,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         btnSearch = findViewById(R.id.btnSearch)
         bottomNav = findViewById(R.id.bottomNavigationView)
         viewPager = findViewById(R.id.viewPager)
-        val fabMainAdd = findViewById<FloatingActionButton>(R.id.fabMainAdd)
+        fabMainAdd = findViewById<FloatingActionButton>(R.id.fabMainAdd)
 
         userEmail?.let { fetchProfilePicture(it) }
 
@@ -86,6 +87,13 @@ class MainActivity : AppCompatActivity() {
                 
                 // Show search button only on Trade tab (position 3)
                 btnSearch.visibility = if (position == 3) android.view.View.VISIBLE else android.view.View.GONE
+                
+                // Hide Global FAB on Trade Screen (Index 3), show on others
+                if (position == 3) {
+                    fabMainAdd.visibility = android.view.View.GONE
+                } else {
+                    fabMainAdd.visibility = android.view.View.VISIBLE
+                }
                 
                 val menuIndex = when(position) {
                     0 -> 0 // Home

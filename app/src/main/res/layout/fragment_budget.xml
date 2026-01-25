@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
+    android:background="@color/background_light"
     android:fillViewport="true">
 
     <LinearLayout
@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="#FFFFFF"
+            app:cardBackgroundColor="@color/white"
             app:cardElevation="0dp"
             android:layout_marginBottom="16dp">
 
@@ -41,7 +41,7 @@
                             android:layout_height="wrap_content"
                             android:text="Total Spending"
                             android:textSize="14sp"
-                            android:textColor="#757575"/>
+                            android:textColor="@color/text_subtitle"/>
                     </LinearLayout>
 
                     <TextView
@@ -51,7 +51,7 @@
                         android:text="₹0"
                         android:textStyle="bold"
                         android:textSize="20sp"
-                        android:textColor="#333333"/>
+                        android:textColor="@color/text_title"/>
                 </LinearLayout>
 
                 <ProgressBar
@@ -69,7 +69,7 @@
                     android:layout_height="wrap_content"
                     android:text="Calculating..."
                     android:textSize="12sp"
-                    android:textColor="#757575"
+                    android:textColor="@color/text_subtitle"
                     android:layout_marginTop="8dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -164,14 +164,14 @@
             android:text="Spending by Category"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:textColor="#333333"
+            android:textColor="@color/text_title"
             android:layout_marginBottom="16dp"/>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="#FFFFFF"
+            app:cardBackgroundColor="@color/white"
             app:cardElevation="0dp"
             android:layout_marginBottom="16dp">
 
@@ -197,7 +197,7 @@
             android:text="View Full Breakdown"
             android:textColor="@color/finwise_green"
             android:textStyle="bold"
-            app:backgroundTint="#E0F2F1"
+            app:backgroundTint="@color/pill_positive_bg"
             app:cornerRadius="12dp"
             android:layout_marginBottom="24dp"
             style="@style/Widget.MaterialComponents.Button.TextButton"/>
@@ -209,7 +209,7 @@
             android:text="Your expenses"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:textColor="#333333"
+            android:textColor="@color/text_title"
             android:layout_marginBottom="16dp"/>
 
         <androidx.recyclerview.widget.RecyclerView

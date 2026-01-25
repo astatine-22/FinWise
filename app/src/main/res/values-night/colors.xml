@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base Colors -->
+    <color name="black">#FFFFFFFF</color>
+    <color name="white">#1E1E1E</color>
+    <color name="finwise_green">#22C55E</color>
+    <color name="dark_green">#4ADE80</color>
+    <color name="red_error">#EF4444</color>
+
+    <!-- Splash Screen -->
+    <color name="splash_background">#121212</color>
+    <color name="logo_circle_bg">#2C2C2C</color>
+
+    <!-- Text Colors -->
+    <color name="text_title">#E0E0E0</color>
+    <color name="text_subtitle">#B0B0B0</color>
+    <color name="text_dark_gray">#E0E0E0</color>
+
+    <!-- Dashboard Card Backgrounds (Dark Surface with Tint) -->
+    <color name="card_budget_bg">#1B3520</color>
+    <color name="card_learn_bg">#3E2723</color>
+    <color name="card_goals_bg">#262244</color>
+    <color name="card_trading_bg">#0D2845</color>
+
+    <!-- Progress Colors -->
+    <color name="progress_budget">#22C55E</color>
+    <color name="progress_goals">#CE93D8</color>
+
+    <!-- Gain/Loss Colors -->
+    <color name="text_gain_green">#4ADE80</color>
+
+    <!-- Category Colors -->
+    <color name="cat_food">#FFB74D</color>
+    <color name="cat_shopping">#BA68C8</color>
+    <color name="cat_transport">#4FC3F7</color>
+    <color name="cat_entertainment">#4DB6AC</color>
+
+    <!-- Trade Section Colors -->
+    <color name="blue_primary">#64B5F6</color>
+    <color name="orange_crypto">#FFB74D</color>
+    <color name="trade_tab_selected">#22C55E</color>
+    <color name="trade_positive_green">#4ADE80</color>
+    <color name="trade_negative_red">#F87171</color>
+    <color name="trade_header_dark">#121212</color>
+    <color name="lime_accent">#22C55E</color>
+
+    <!-- Gradients -->
+    <color name="gradient_start">#22C55E</color>
+    <color name="gradient_end">#15803D</color>
+
+    <!-- Text Opacity -->
+    <color name="text_white_70">#B3FFFFFF</color>
+
+    <!-- Dividers & Borders -->
+    <color name="divider_light">#2A2A2A</color>
+    <color name="divider_color">#2A2A2A</color>
+    <color name="logo_border_grey">#444444</color>
+
+    <!-- Pills & Badges -->
+    <color name="pill_positive_bg">#14532D</color>
+    <color name="pill_positive_text">#4ADE80</color>
+    <color name="pill_negative_bg">#450A0A</color>
+    <color name="pill_negative_text">#F87171</color>
+
+    <!-- Shimmer Loading -->
+    <color name="shimmer_placeholder">#2A2A2A</color>
+    <color name="shimmer_placeholder_dark">#121212</color>
+
+    <!-- Trade Colors (Alternative naming) -->
+    <color name="colorPositiveGreen">#4ADE80</color>
+    <color name="colorNegativeRed">#F87171</color>
+
+    <!-- General Background -->
+    <color name="background_light">#121212</color>
+    <color name="search_bar_bg">#25402B</color>
+
+    <!-- Profile & Gamification -->
+    <color name="xp_star_color">#FFD54F</color>
+    <color name="xp_text_color">#81C784</color>
+    <color name="badge_color">#FF8A65</color>
+
+    <!-- Budget Section -->
+    <color name="budget_icon_tint">#81C784</color>
+    <color name="budget_title_text">#A5D6A7</color>
+    <color name="budget_subtitle_text">#C8E6C9</color>
+
+    <!-- Learn Section -->
+    <color name="learn_orange">#FFB74D</color>
+    <color name="learn_subtitle_text">#FFE0B2</color>
+    <color name="learn_divider">#5D4037</color>
+
+    <!-- Goals Section -->
+    <color name="goals_purple">#BA68C8</color>
+    <color name="goals_subtitle_text">#E1BEE7</color>
+    <color name="goals_progress_bg">#4A148C</color>
+
+    <!-- Trading Section -->
+    <color name="trading_blue">#64B5F6</color>
+    <color name="trading_subtitle_text">#BBDEFB</color>
+
+    <!-- Hall of Fame -->
+    <color name="hall_of_fame_bg">#263238</color>
+    <color name="hall_of_fame_text">#FFB74D</color>
+    <color name="hall_of_fame_subtitle">#FFE0B2</color>
+</resources>

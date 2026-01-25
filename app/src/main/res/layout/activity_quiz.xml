@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_light"
+    android:padding="24dp">
+
+    <!-- Question Counter -->
+    <TextView
+        android:id="@+id/tvQuestionCounter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Question 1/10"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/finwise_green"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Question Text -->
+    <TextView
+        android:id="@+id/tvQuestion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="What is a Bull Market?"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_title"
+        android:layout_marginBottom="32dp"
+        android:lineSpacingExtra="4dp"/>
+
+    <!-- Options Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOption1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Option 1"
+            android:textColor="@color/text_title"
+            android:backgroundTint="@color/card_budget_bg"
+            android:layout_marginBottom="12dp"
+            app:cornerRadius="12dp"
+            app:strokeColor="@color/divider_color"
+            app:strokeWidth="1dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOption2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Option 2"
+            android:textColor="@color/text_title"
+            android:backgroundTint="@color/card_budget_bg"
+            android:layout_marginBottom="12dp"
+            app:cornerRadius="12dp"
+            app:strokeColor="@color/divider_color"
+            app:strokeWidth="1dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOption3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Option 3"
+            android:textColor="@color/text_title"
+            android:backgroundTint="@color/card_budget_bg"
+            android:layout_marginBottom="12dp"
+            app:cornerRadius="12dp"
+            app:strokeColor="@color/divider_color"
+            app:strokeWidth="1dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOption4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Option 4"
+            android:textColor="@color/text_title"
+            android:backgroundTint="@color/card_budget_bg"
+            app:cornerRadius="12dp"
+            app:strokeColor="@color/divider_color"
+            app:strokeWidth="1dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+    </LinearLayout>
+
+</LinearLayout>

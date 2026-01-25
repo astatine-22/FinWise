@@ -41,6 +41,9 @@
             android:name=".LessonDetailActivity"
             android:exported="false" />
         <activity
+            android:name=".QuizActivity"
+            android:exported="false" />
+        <activity
             android:name=".BudgetActivity"
             android:exported="false" />
         <activity

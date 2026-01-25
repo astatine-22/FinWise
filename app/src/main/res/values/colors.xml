@@ -13,7 +13,7 @@
     <color name="text_title">#2D2D2D</color>
     <color name="text_subtitle">#757575</color>
 
-    <color name="card_budget_bg">#E8F5E9</color>
+    <color name="card_budget_bg">#FFFFFF</color>
     <color name="card_learn_bg">#FFF3E0</color>
     <color name="card_goals_bg">#F3E5F5</color>
     <color name="card_trading_bg">#E3F2FD</color>
@@ -58,6 +58,7 @@
 
     <!-- Extracted Colors -->
     <color name="background_light">#F8F9FA</color>
+    <color name="search_bar_bg">#F3F4F6</color>
     <color name="divider_color">#E0E0E0</color>
     <color name="xp_star_color">#FFC107</color>
     <color name="xp_text_color">#4CAF50</color>

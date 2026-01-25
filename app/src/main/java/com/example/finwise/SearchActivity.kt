@@ -171,11 +171,10 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        // 2. US Stocks (Using getAllStocks as proxy for now)
+        // 2. US Stocks
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // Ideally this should be getUsStocks() if available
-                val response = RetrofitClient.instance.getAllStocks()
+                val response = RetrofitClient.instance.getUsStocks()
                 withContext(Dispatchers.Main) {
                     shimmerUsStocks.stopShimmer()
                     shimmerUsStocks.visibility = View.GONE

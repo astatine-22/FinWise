@@ -85,6 +85,11 @@ data class LearnVideoResponse(
     val is_featured: Boolean
 )
 
+data class LessonCompleteRequest(
+    val email: String,
+    val video_id: Int
+)
+
 // ============================================================================
 // PAPER TRADING MODELS (All values in Indian Rupees ₹)
 // ============================================================================
@@ -334,6 +339,9 @@ interface ApiService {
 
     @POST("api/learn/seed")
     suspend fun seedLearnVideos(): SimpleResponse
+
+    @POST("api/learn/complete")
+    suspend fun completeLesson(@Body request: LessonCompleteRequest): SimpleResponse
 
     // --- Paper Trading Routes (All values in ₹) ---
     @GET("api/trade/portfolio")

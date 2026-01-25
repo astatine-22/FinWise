@@ -79,9 +79,8 @@ class DashboardFragment : Fragment() {
         val cardBadges = view.findViewById<CardView>(R.id.cardBadges)
         val cardStreak = view.findViewById<CardView>(R.id.cardStreak)
 
-        // Load all data
+        // Load all data (except gamification - moved to onResume)
         userEmail?.let { email ->
-            fetchGamificationData(email)  // New gamification fetch
             fetchBudgetData(email)
             fetchLearnData()
             fetchPortfolioData(email)
@@ -118,6 +117,15 @@ class DashboardFragment : Fragment() {
         // Hall of Fame - Open LeaderboardActivity
         view.findViewById<CardView>(R.id.cardHallOfFame).setOnClickListener {
             startActivity(android.content.Intent(requireContext(), LeaderboardActivity::class.java))
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh gamification data every time the fragment becomes visible
+        // This ensures XP updates from completing lessons are shown immediately
+        userEmail?.let { email ->
+            fetchGamificationData(email)
         }
     }
 

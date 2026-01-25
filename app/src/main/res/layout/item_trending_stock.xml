@@ -6,7 +6,7 @@
     android:layout_marginHorizontal="4dp"
     app:cardCornerRadius="14dp"
     app:cardElevation="2dp"
-    app:cardBackgroundColor="#FFFFFF"
+    app:cardBackgroundColor="@color/card_budget_bg"
     app:strokeWidth="0dp">
 
     <LinearLayout
@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="RELIANCE"
-            android:textColor="#1F2937"
+            android:textColor="@color/text_title"
             android:textSize="14sp"
             android:textStyle="bold"
             android:maxLines="1"
@@ -45,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="₹2,450.00"
-            android:textColor="#374151"
+            android:textColor="@color/text_title"
             android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginTop="4dp" />

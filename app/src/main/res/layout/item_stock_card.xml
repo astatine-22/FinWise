@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="#FFFFFF">
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,7 +46,7 @@
                 android:text="Kotak Mahindra"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="#1F2937"
+                android:textColor="@color/text_title"
                 android:maxLines="1"
                 android:ellipsize="end" />
 
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:text="Banking"
                 android:textSize="13sp"
-                android:textColor="#6B7280"
+                android:textColor="@color/text_subtitle"
                 android:layout_marginTop="2dp" />
         </LinearLayout>
 
@@ -74,7 +74,7 @@
                 android:text="₹2,201.10"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="#1F2937" />
+                android:textColor="@color/text_title" />
 
             <TextView
                 android:id="@+id/tvStockChange"
@@ -92,7 +92,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#F3F4F6"
+        android:background="@color/divider_color"
         android:layout_marginStart="72dp" />
 
 </LinearLayout>

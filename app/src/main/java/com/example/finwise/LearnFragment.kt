@@ -31,6 +31,12 @@ class LearnFragment : Fragment() {
 
     private fun initializeViews(view: View) {
         rvLessons = view.findViewById(R.id.rvVideos)
+        
+        // Setup Quiz Button
+        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnTakeQuiz)?.setOnClickListener {
+            val intent = Intent(requireContext(), QuizActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun setupRecyclerView() {

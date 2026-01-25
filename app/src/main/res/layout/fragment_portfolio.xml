@@ -6,7 +6,7 @@
     android:fillViewport="true"
     android:clipToPadding="false"
     android:paddingBottom="80dp"
-    android:background="#FFFFFF">
+    android:background="@color/background_light">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -144,7 +144,7 @@
                 android:text="Your Holdings"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#1F2937" />
+                android:textColor="@color/text_title" />
 
             <TextView
                 android:id="@+id/tvHoldingsCount"
@@ -152,7 +152,7 @@
                 android:layout_height="wrap_content"
                 android:text="0 assets"
                 android:textSize="14sp"
-                android:textColor="#6B7280" />
+                android:textColor="@color/text_subtitle" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -176,7 +176,7 @@
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:src="@drawable/ic_chart"
-                app:tint="#D1D5DB" />
+                app:tint="@color/text_subtitle" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -184,7 +184,7 @@
                 android:text="No Holdings Yet"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#1F2937"
+                android:textColor="@color/text_title"
                 android:layout_marginTop="16dp" />
 
             <TextView
@@ -192,7 +192,7 @@
                 android:layout_height="wrap_content"
                 android:text="Start trading by buying your first asset!"
                 android:textSize="14sp"
-                android:textColor="#6B7280"
+                android:textColor="@color/text_subtitle"
                 android:layout_marginTop="8dp"
                 android:gravity="center" />
         </LinearLayout>

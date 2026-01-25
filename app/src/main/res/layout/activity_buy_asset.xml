@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/background_light"
     android:fitsSystemWindows="true">
 
     <!-- Full Screen Scrollable Content -->
@@ -110,7 +110,7 @@
                         android:visibility="gone"
                         app:cardCornerRadius="12dp"
                         app:cardElevation="8dp"
-                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardBackgroundColor="@color/white"
                         android:layout_marginTop="8dp">
 
                         <androidx.recyclerview.widget.RecyclerView
@@ -249,6 +249,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:background="@drawable/bg_content_rounded_top"
+                android:backgroundTint="@color/white"
                 android:layout_marginTop="-60dp"
                 android:paddingTop="20dp"
                 android:paddingHorizontal="16dp"
@@ -261,7 +262,7 @@
                     android:layout_height="wrap_content"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="4dp"
-                    app:cardBackgroundColor="#FFFFFF">
+                    app:cardBackgroundColor="@color/white">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -281,7 +282,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="Price History"
-                                android:textColor="#1F2937"
+                                android:textColor="@color/text_title"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
 
@@ -391,7 +392,7 @@
                         android:layout_marginEnd="8dp"
                         app:cardCornerRadius="14dp"
                         app:cardElevation="0dp"
-                        app:cardBackgroundColor="#F3F4F6">
+                        app:cardBackgroundColor="@color/logo_circle_bg">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -403,7 +404,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="AVAILABLE CASH"
-                                android:textColor="#6B7280"
+                                android:textColor="@color/text_subtitle"
                                 android:textSize="10sp"
                                 android:letterSpacing="0.05" />
 
@@ -412,7 +413,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="₹1,00,000.00"
-                                android:textColor="#1F2937"
+                                android:textColor="@color/text_title"
                                 android:textSize="17sp"
                                 android:textStyle="bold"
                                 android:layout_marginTop="6dp" />
@@ -427,7 +428,7 @@
                         android:layout_marginStart="8dp"
                         app:cardCornerRadius="14dp"
                         app:cardElevation="0dp"
-                        app:cardBackgroundColor="#F3F4F6">
+                        app:cardBackgroundColor="@color/logo_circle_bg">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -439,7 +440,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="YOUR HOLDINGS"
-                                android:textColor="#6B7280"
+                                android:textColor="@color/text_subtitle"
                                 android:textSize="10sp"
                                 android:letterSpacing="0.05" />
 
@@ -448,7 +449,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0 shares"
-                                android:textColor="#1F2937"
+                                android:textColor="@color/text_title"
                                 android:textSize="17sp"
                                 android:textStyle="bold"
                                 android:layout_marginTop="6dp" />
@@ -469,7 +470,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Number of Shares"
-                        android:textColor="#6B7280"
+                        android:textColor="@color/text_subtitle"
                         android:textSize="13sp" />
 
                     <!-- Quantity Input -->
@@ -501,7 +502,7 @@
                             android:text="1"
                             android:textSize="48sp"
                             android:textStyle="bold"
-                            android:textColor="#1F2937"
+                            android:textColor="@color/text_title"
                             android:gravity="center"
                             android:inputType="number"
                             android:background="@null"
@@ -619,7 +620,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#FFFFFF"
+        android:background="@color/white"
         android:elevation="16dp"
         android:paddingHorizontal="16dp"
         android:paddingTop="16dp"
@@ -639,7 +640,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Estimated Cost"
-                android:textColor="#6B7280"
+                android:textColor="@color/text_subtitle"
                 android:textSize="15sp" />
 
             <TextView
@@ -647,7 +648,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="₹2,450.00"
-                android:textColor="#1F2937"
+                android:textColor="@color/text_title"
                 android:textSize="20sp"
                 android:textStyle="bold" />
         </LinearLayout>

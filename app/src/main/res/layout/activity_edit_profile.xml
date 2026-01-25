@@ -1,55 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#F8F9FA"
-    android:fitsSystemWindows="true">
+    android:background="@color/background_light"
+    android:fitsSystemWindows="true"
+    android:fillViewport="true">
 
-    <!-- Header -->
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/white"
-        android:elevation="4dp"
-        android:paddingHorizontal="16dp">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_arrow_back"
-            android:contentDescription="Back"
-            app:tint="#333333" />
+        <!-- Header -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/white"
+            android:elevation="4dp"
+            android:paddingHorizontal="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Edit Profile"
-            android:textColor="#333333"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_arrow_back"
+                android:contentDescription="Back"
+                app:tint="@color/text_title" />
 
-        <TextView
-            android:id="@+id/btnSave"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:text="Save"
-            android:textColor="#4CAF50"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-    </RelativeLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Edit Profile"
+                android:textColor="@color/text_title"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+            <TextView
+                android:id="@+id/btnSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:text="Save"
+                android:textColor="@color/finwise_green"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:padding="8dp" />
+        </RelativeLayout>
 
+        <!-- Content -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -62,23 +64,23 @@
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="32dp">
+                android:layout_marginBottom="16dp">
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="120dp"
                     android:layout_height="120dp"
                     app:cardCornerRadius="60dp"
                     app:cardElevation="4dp"
-                    app:cardBackgroundColor="#F5DEB3">
+                    app:cardBackgroundColor="@color/logo_circle_bg">
 
                     <ImageView
-                        android:id="@+id/ivProfileAvatar"
+                        android:id="@+id/ivProfileImage"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_person"
                         android:padding="28dp"
-                        app:tint="#5D8A68" />
+                        app:tint="@color/finwise_green" />
                 </androidx.cardview.widget.CardView>
 
                 <!-- Camera Badge -->
@@ -99,64 +101,139 @@
             </FrameLayout>
 
             <TextView
+                android:id="@+id/tvChangePhoto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="32dp"
                 android:text="Tap to change photo"
-                android:textColor="#757575"
-                android:textSize="14sp" />
+                android:textColor="@color/finwise_green"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <!-- Name Field -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Name"
-                android:textColor="#757575"
+                android:textColor="@color/text_subtitle"
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp" />
 
-            <EditText
-                android:id="@+id/etName"
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_input_field"
-                android:hint="Enter your name"
-                android:inputType="textPersonName"
-                android:padding="16dp"
-                android:textColor="#333333"
-                android:textSize="16sp"
-                android:layout_marginBottom="24dp" />
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxStrokeColor="@color/finwise_green"
+                app:hintEnabled="false"
+                android:layout_marginBottom="24dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter your name"
+                    android:textColorHint="@color/text_subtitle"
+                    android:background="@null"
+                    android:inputType="textPersonName"
+                    android:textColor="@color/text_title"
+                    android:textSize="16sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Email Field (Read-only) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email"
-                android:textColor="#757575"
+                android:textColor="@color/text_subtitle"
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp" />
 
-            <EditText
-                android:id="@+id/etEmail"
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_input_field"
-                android:enabled="false"
-                android:hint="Email address"
-                android:inputType="textEmailAddress"
-                android:padding="16dp"
-                android:textColor="#9E9E9E"
-                android:textSize="16sp" />
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxStrokeColor="@color/divider_color"
+                app:hintEnabled="false"
+                android:layout_marginBottom="8dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Email address"
+                    android:enabled="false"
+                    android:textColorHint="@color/text_subtitle"
+                    android:background="@null"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/text_subtitle"
+                    android:textSize="16sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Email cannot be changed"
-                android:textColor="#9E9E9E"
+                android:text="📧 Email cannot be changed"
+                android:textColor="@color/text_subtitle"
                 android:textSize="12sp"
-                android:layout_marginTop="4dp" />
+                android:layout_marginBottom="32dp" />
+
+            <!-- Phone Field -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phone (Optional)"
+                android:textColor="@color/text_subtitle"
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxStrokeColor="@color/finwise_green"
+                app:hintEnabled="false"
+                android:layout_marginBottom="32dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="+91 XXXXX XXXXX"
+                    android:textColorHint="@color/text_subtitle"
+                    android:background="@null"
+                    android:inputType="phone"
+                    android:textColor="@color/text_title"
+                    android:textSize="16sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Save Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSaveChanges"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save Changes"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:backgroundTint="@color/finwise_green"
+                app:cornerRadius="12dp"
+                android:padding="16dp" />
 
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

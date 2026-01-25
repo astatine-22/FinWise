@@ -71,7 +71,10 @@ class TradeFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        fabQuickBuy.setOnClickListener { openBuyActivity(null) }
+        fabQuickBuy.setOnClickListener {
+            val intent = Intent(requireContext(), SearchActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun openBuyActivity(prefilledSymbol: String?) {

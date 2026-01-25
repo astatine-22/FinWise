@@ -5,7 +5,7 @@
     android:fillViewport="true"
     android:clipToPadding="false"
     android:paddingBottom="80dp"
-    android:background="#FFFFFF">
+    android:background="@color/background_light">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
             android:text="Popular Cryptocurrencies"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#1F2937" />
+            android:textColor="@color/text_title" />
 
         <FrameLayout
             android:layout_width="match_parent"

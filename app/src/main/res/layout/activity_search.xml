@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
-    android:background="#FFFFFF">
+    android:background="@color/background_light">
 
     <!-- Search Header -->
     <LinearLayout
@@ -16,7 +16,7 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="16dp"
-        android:background="#FFFFFF"
+        android:background="@color/background_light"
         android:elevation="4dp">
 
         <ImageView
@@ -24,7 +24,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_arrow_back"
-            app:tint="#1F2937"
+            app:tint="@color/text_title"
             android:background="?attr/selectableItemBackgroundBorderless" />
 
         <LinearLayout
@@ -40,7 +40,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:src="@drawable/ic_search"
-                app:tint="#9CA3AF" />
+                app:tint="@color/text_subtitle" />
 
             <EditText
                 android:id="@+id/etSearch"
@@ -50,8 +50,8 @@
                 android:layout_marginStart="8dp"
                 android:background="@null"
                 android:hint="Search stocks, crypto..."
-                android:textColor="#1F2937"
-                android:textColorHint="#9CA3AF"
+                android:textColor="@color/text_title"
+                android:textColorHint="@color/text_subtitle"
                 android:textSize="15sp"
                 android:inputType="text"
                 android:imeOptions="actionSearch"
@@ -63,7 +63,7 @@
                 android:layout_height="20dp"
                 android:src="@drawable/ic_close"
                 android:visibility="gone"
-                app:tint="#6B7280" />
+                app:tint="@color/text_subtitle" />
         </LinearLayout>
     </LinearLayout>
 
@@ -123,7 +123,7 @@
                     android:text="🇮🇳 Indian Market"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="#111827"
+                    android:textColor="@color/text_title"
                     android:layout_marginStart="16dp"
                     android:layout_marginBottom="12dp" />
 
@@ -167,7 +167,7 @@
                     android:text="🇺🇸 US Market"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="#111827"
+                    android:textColor="@color/text_title"
                     android:layout_marginStart="16dp"
                     android:layout_marginBottom="12dp" />
 
@@ -211,7 +211,7 @@
                     android:text="₿ Crypto"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="#111827"
+                    android:textColor="@color/text_title"
                     android:layout_marginStart="16dp"
                     android:layout_marginBottom="12dp" />
 

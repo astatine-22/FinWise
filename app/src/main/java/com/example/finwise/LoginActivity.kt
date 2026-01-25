@@ -53,6 +53,15 @@ class LoginActivity : AppCompatActivity() {
         if (sessionManager.isLoggedIn()) {
             val email = sessionManager.fetchUserEmail()
             if (email != null) {
+                // Refresh profile data in background for returning user
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val repository = com.example.finwise.data.ServiceLocator.getUserRepository(this@LoginActivity)
+                        repository.refreshUserProfile(email)
+                    } catch (e: Exception) {
+                        Log.e("LoginActivity", "Auto-login profile refresh failed: ${e.message}")
+                    }
+                }
                 goToMainActivity(email)
                 return
             }
@@ -61,6 +70,15 @@ class LoginActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
         val savedEmail = sharedPref.getString("LOGGED_IN_EMAIL", null)
         if (savedEmail != null) {
+            // Refresh profile data in background for returning user
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val repository = com.example.finwise.data.ServiceLocator.getUserRepository(this@LoginActivity)
+                    repository.refreshUserProfile(savedEmail)
+                } catch (e: Exception) {
+                    Log.e("LoginActivity", "Auto-login profile refresh failed: ${e.message}")
+                }
+            }
             goToMainActivity(savedEmail)
             return
         }
@@ -195,6 +213,21 @@ class LoginActivity : AppCompatActivity() {
         
         // Refresh RetrofitClient to pick up the new token
         RetrofitClient.refreshClient()
+        
+        // ========== FETCH USER PROFILE IMMEDIATELY ==========
+        // This downloads the profile picture and user data to Room database
+        // so it's available offline when the user opens the Profile screen
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val repository = com.example.finwise.data.ServiceLocator.getUserRepository(this@LoginActivity)
+                repository.refreshUserProfile(email)
+                Log.d("LoginActivity", "Profile data fetched and cached successfully")
+            } catch (e: Exception) {
+                Log.e("LoginActivity", "Failed to fetch profile data: ${e.message}")
+                // Don't block login if profile fetch fails
+            }
+        }
+        // ====================================================
         
         Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
         goToMainActivity(email)

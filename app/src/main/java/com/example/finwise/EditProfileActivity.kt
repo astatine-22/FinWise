@@ -99,14 +99,29 @@ class EditProfileActivity : AppCompatActivity() {
 
     private fun loadProfilePicture(base64Image: String?) {
         if (base64Image != null && base64Image.isNotEmpty()) {
-            try {
-                val imageBytes = Base64.decode(base64Image, Base64.DEFAULT)
-                val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                ivProfileAvatar.setImageBitmap(bitmap)
+            // Check if it's a URL (from Google login)
+            if (base64Image.startsWith("http://") || base64Image.startsWith("https://")) {
+                // Load from URL using Glide
+                com.bumptech.glide.Glide.with(this)
+                    .load(base64Image)
+                    .circleCrop()
+                    .placeholder(R.drawable.ic_person)
+                    .error(R.drawable.ic_person)
+                    .into(ivProfileAvatar)
+                
                 ivProfileAvatar.setPadding(0, 0, 0, 0)
                 ivProfileAvatar.imageTintList = null
-            } catch (e: Exception) {
-                // Keep default icon
+            } else {
+                // Assume it's Base64 encoded (from manual upload)
+                try {
+                    val imageBytes = Base64.decode(base64Image, Base64.DEFAULT)
+                    val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                    ivProfileAvatar.setImageBitmap(bitmap)
+                    ivProfileAvatar.setPadding(0, 0, 0, 0)
+                    ivProfileAvatar.imageTintList = null
+                } catch (e: Exception) {
+                    // Keep default icon
+                }
             }
         }
     }
