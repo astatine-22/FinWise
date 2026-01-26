@@ -84,4 +84,7 @@ dependencies {
     // Glide - Image Loading (for Google profile picture URLs)
     implementation("com.github.bumptech.glide:glide:4.16.0")
     ksp("com.github.bumptech.glide:compiler:4.16.0")
+
+    // Youtube Player
+    implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
 }

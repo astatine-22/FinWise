@@ -351,6 +351,12 @@ interface ApiService {
     @POST("api/learn/quiz/submit")
     suspend fun submitQuiz(@Body submission: QuizSubmission): QuizResult
 
+    @POST("api/learn/quiz/check-answer")
+    suspend fun checkAnswer(@Body request: CheckAnswerRequest): CheckAnswerResponse
+
+    @POST("api/learn/quiz/claim-bonus")
+    suspend fun claimBonus(@Body request: ClaimBonusRequest): BonusResponse
+
     @POST("api/learn/seed-v2")
     suspend fun seedLearnV2(): SimpleResponse
 

@@ -60,3 +60,26 @@ data class QuizResult(
     val xp_earned: Int,
     val message: String
 )
+
+data class CheckAnswerRequest(
+    val email: String,
+    val question_id: Int,
+    val selected_option: String
+)
+
+data class CheckAnswerResponse(
+    val is_correct: Boolean,
+    val correct_option: String, // "A", "B", "C", "D"
+    val xp_message: String // "+10 XP" or "Wrong answer"
+)
+
+data class ClaimBonusRequest(
+    val email: String,
+    val quiz_id: Int
+)
+
+data class BonusResponse(
+    val success: Boolean,
+    val message: String,
+    val xp_bonus: Int
+)
