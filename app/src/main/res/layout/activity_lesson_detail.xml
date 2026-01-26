@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -12,40 +13,158 @@
         android:layout_width="match_parent"
         android:layout_height="250dp" />
 
-    <!-- Lesson Title -->
-    <TextView
-        android:id="@+id/tvLessonTitle"
+    <!-- Scrollable Content Below Video -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:background="#FAFAFA">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+
+            <!-- Video Info Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@android:color/white"
+                android:padding="16dp"
+                android:elevation="2dp">
+
+                <TextView
+                    android:id="@+id/tvLessonTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Stock Market Basics"
+                    android:textColor="@color/text_title"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tvLessonDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Learn the fundamentals of stock market investing"
+                    android:textColor="@color/text_subtitle"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp" />
+            </LinearLayout>
+
+            <!-- Quiz Section (Appears below video info) -->
+            <LinearLayout
+                android:id="@+id/layoutQuizSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="16dp"
+                android:paddingHorizontal="16dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:id="@+id/tvQuizTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Test Your Knowledge"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_title" />
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Earn XP"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/finwise_green"
+                        android:background="@drawable/bg_category_chip"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"/>
+                </LinearLayout>
+
+                <!-- Questions RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvQuestions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_quiz_question"
+                    tools:itemCount="3" />
+
+            </LinearLayout>
+
+            <!-- Loading Indicator for Quiz -->
+            <ProgressBar
+                android:id="@+id/progressQuiz"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="32dp"
+                android:visibility="visible" />
+
+            <!-- Error Message for Quiz -->
+            <TextView
+                android:id="@+id/tvQuizError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:text="Quiz loading..."
+                android:textColor="@color/text_subtitle"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom Buttons Area -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Stock Market Basics"
-        android:textColor="@color/text_title"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:padding="16dp" />
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@android:color/white"
+        android:elevation="8dp">
 
-    <!-- Lesson Description -->
-    <TextView
-        android:id="@+id/tvLessonDescription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Learn the fundamentals of stock market investing"
-        android:textColor="@color/text_subtitle"
-        android:textSize="14sp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="16dp" />
+        <!-- Submit Quiz Button (Primary) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSubmitQuiz"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Submit Quiz"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:enabled="false"
+            android:visibility="gone"
+            app:backgroundTint="@color/finwise_green"
+            app:cornerRadius="12dp"
+            android:elevation="4dp" />
 
-
-    <!-- Mark as Completed Button -->
-    <Button
-        android:id="@+id/btnMarkCompleted"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Mark as Completed (+100 XP)"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:background="@drawable/bg_button_invest_now"
-        android:layout_margin="16dp"
-        android:padding="14dp" />
+        <!-- Fallback: Mark as Completed (Only if no quiz) -->
+        <Button
+            android:id="@+id/btnMarkCompleted"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Mark as Completed (+100 XP)"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:background="@drawable/bg_button_invest_now"
+            android:visibility="gone" />
+            
+    </LinearLayout>
 </LinearLayout>

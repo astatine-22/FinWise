@@ -46,6 +46,7 @@ import java.util.Locale
 class BudgetFragment : Fragment(), OnChartValueSelectedListener {
 
     // UI Components
+    private lateinit var swipeRefreshLayout: androidx.swiperefreshlayout.widget.SwipeRefreshLayout
     private lateinit var tvTotalSpent: TextView
     private lateinit var progressBarBudget: ProgressBar
     private lateinit var tvRemaining: TextView
@@ -54,13 +55,20 @@ class BudgetFragment : Fragment(), OnChartValueSelectedListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ExpensesAdapter
     private lateinit var btnViewBreakdown: MaterialButton
+    private lateinit var layoutEmptyState: View
 
-    // Data
+    // Data - MUTABLE LIST FOR STRICT CLEARING
     private var userEmail: String? = null
-    private var currentRange = "1m" // Default to 1 Month
+    private var currentRange = "today" // Default to Today (current date)
     private var totalSpentString: String = ""
     private var currentCategoryList: List<CategorySummaryResponse> = emptyList()
     private var totalSpentAmount: Float = 0f
+    
+    // Mutable list to prevent duplicates - cleared on every update
+    private val expenseList = mutableListOf<ExpenseResponse>()
+    
+    // Cache all expenses for re-filtering when range changes
+    private var allExpensesData: List<LocalExpense> = emptyList()
 
     // Pastel Colors
     private val chartColors: List<Int> = listOf(
@@ -103,6 +111,7 @@ class BudgetFragment : Fragment(), OnChartValueSelectedListener {
     }
 
     private fun initializeViews(view: View) {
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         tvTotalSpent = view.findViewById(R.id.tvTotalSpent)
         progressBarBudget = view.findViewById(R.id.progressBarBudget)
         tvRemaining = view.findViewById(R.id.tvRemaining)
@@ -110,10 +119,15 @@ class BudgetFragment : Fragment(), OnChartValueSelectedListener {
         pieChart = view.findViewById(R.id.pieChart)
         recyclerView = view.findViewById(R.id.rvExpenses)
         btnViewBreakdown = view.findViewById(R.id.btnViewBreakdown)
+        layoutEmptyState = view.findViewById(R.id.layoutEmptyState)
+        
+        // Setup pull-to-refresh
+        setupSwipeRefresh()
     }
 
     private fun setupRecyclerView() {
-        adapter = ExpensesAdapter(emptyList()) { clickedExpense ->
+        // Use the mutable list for the adapter
+        adapter = ExpensesAdapter(expenseList) { clickedExpense ->
             // When an item is clicked, open the options sheet
             showExpenseOptions(clickedExpense)
         }
@@ -158,7 +172,21 @@ class BudgetFragment : Fragment(), OnChartValueSelectedListener {
                     R.id.chipAll -> "all"
                     else -> "1m"
                 }
+                // Immediately refresh the view with new filter
+                refreshCurrentView()
+                // Also trigger API refresh in background
                 loadDataForRange(currentRange)
+            }
+        }
+    }
+
+    private fun setupSwipeRefresh() {
+        swipeRefreshLayout.setColorSchemeResources(R.color.finwise_green, R.color.goals_purple)
+        swipeRefreshLayout.setOnRefreshListener {
+            userEmail?.let { email ->
+                refreshFromApi(email)
+            } ?: run {
+                swipeRefreshLayout.isRefreshing = false
             }
         }
     }
@@ -173,16 +201,124 @@ class BudgetFragment : Fragment(), OnChartValueSelectedListener {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 repository.allExpenses.collectLatest { localExpenses ->
                     if (isAdded) {
-                        // Convert LocalExpense to ExpenseResponse for adapter compatibility
-                        val expenseResponses = localExpenses.map { it.toExpenseResponse() }
-                        adapter.updateData(expenseResponses)
+                        // Cache all expenses for re-filtering
+                        allExpensesData = localExpenses
+                        
+                        // STRICT MODE: Clear list before adding new data to prevent duplicates
+                        expenseList.clear()
+                        
+                        // Filter expenses based on current range
+                        val filteredExpenses = filterExpensesByRange(localExpenses, currentRange)
+                        
+                        // Convert LocalExpense to ExpenseResponse and add to mutable list
+                        val expenseResponses = filteredExpenses.map { it.toExpenseResponse() }
+                        
+                        // Toggle empty state visibility
+                        if (expenseResponses.isEmpty()) {
+                            // Show empty state, hide RecyclerView
+                            layoutEmptyState.visibility = View.VISIBLE
+                            recyclerView.visibility = View.GONE
+                        } else {
+                            // Hide empty state, show RecyclerView
+                            layoutEmptyState.visibility = View.GONE
+                            recyclerView.visibility = View.VISIBLE
+                            
+                            // Add all filtered expenses to the cleared list
+                            expenseList.addAll(expenseResponses)
+                        }
+                        
+                        // Notify adapter of changes
+                        adapter.notifyDataSetChanged()
 
-                        // Update chart data from local expenses
-                        updateChartFromLocalData(localExpenses)
+                        // Update chart data from filtered local expenses
+                        updateChartFromLocalData(filteredExpenses)
                     }
                 }
             }
         }
+    }
+    
+    /**
+     * Manually refresh the current view with updated filter
+     * Called when user changes date range via chips
+     */
+    private fun refreshCurrentView() {
+        // Use cached data to immediately re-filter and update UI
+        if (isAdded && allExpensesData.isNotEmpty()) {
+            // STRICT MODE: Clear list before adding
+            expenseList.clear()
+            
+            // Filter based on new range
+            val filteredExpenses = filterExpensesByRange(allExpensesData, currentRange)
+            
+            // Convert and add to list
+            val expenseResponses = filteredExpenses.map { it.toExpenseResponse() }
+            
+            // Toggle empty state visibility
+            if (expenseResponses.isEmpty()) {
+                layoutEmptyState.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
+            } else {
+                layoutEmptyState.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+                expenseList.addAll(expenseResponses)
+            }
+            
+            // Notify adapter
+            adapter.notifyDataSetChanged()
+            
+            // Update chart
+            updateChartFromLocalData(filteredExpenses)
+        }
+    }
+
+    /**
+     * Filter expenses based on the selected date range.
+     */
+    private fun filterExpensesByRange(expenses: List<LocalExpense>, range: String): List<LocalExpense> {
+        val calendar = java.util.Calendar.getInstance()
+        val currentTime = calendar.timeInMillis
+        
+        // Calculate the start time based on range
+        val startTime = when (range) {
+            "today" -> {
+                // Start of today (00:00:00)
+                calendar.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                calendar.set(java.util.Calendar.MINUTE, 0)
+                calendar.set(java.util.Calendar.SECOND, 0)
+                calendar.set(java.util.Calendar.MILLISECOND, 0)
+                calendar.timeInMillis
+            }
+            "7d" -> {
+                // Last 7 days
+                currentTime - (7L * 24 * 60 * 60 * 1000)
+            }
+            "1m" -> {
+                // Start of current month
+                calendar.set(java.util.Calendar.DAY_OF_MONTH, 1)
+                calendar.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                calendar.set(java.util.Calendar.MINUTE, 0)
+                calendar.set(java.util.Calendar.SECOND, 0)
+                calendar.set(java.util.Calendar.MILLISECOND, 0)
+                calendar.timeInMillis
+            }
+            "6m" -> {
+                // Last 6 months
+                currentTime - (6L * 30 * 24 * 60 * 60 * 1000)
+            }
+            "1y" -> {
+                // Last 1 year
+                currentTime - (365L * 24 * 60 * 60 * 1000)
+            }
+            "all" -> {
+                // Show all expenses (no filtering)
+                return expenses
+            }
+            else -> currentTime - (30L * 24 * 60 * 60 * 1000) // Default to 1 month
+        }
+        
+        // Filter expenses where dateTimestamp is >= startTime and <= currentTime
+        return expenses.filter { it.dateTimestamp in startTime..currentTime }
     }
 
     /**
@@ -275,9 +411,21 @@ class BudgetFragment : Fragment(), OnChartValueSelectedListener {
      */
     private fun refreshFromApi(email: String) {
         val repository = ServiceLocator.getExpenseRepository(requireContext())
+        
+        // Show indicator if not started by swipe
+        if (!swipeRefreshLayout.isRefreshing) {
+            swipeRefreshLayout.isRefreshing = true
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            repository.refreshExpenses(email)
+            try {
+                repository.refreshExpenses(email)
+            } catch (e: Exception) {
+                // Handle error (optional toast)
+            } finally {
+                // Hide loading indicator
+                swipeRefreshLayout.isRefreshing = false
+            }
         }
     }
 

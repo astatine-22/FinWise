@@ -82,7 +82,8 @@ data class LearnVideoResponse(
     val youtube_video_id: String,
     val category: String,
     val duration_minutes: Int?,
-    val is_featured: Boolean
+    val is_featured: Boolean,
+    val embed_url: String?  // Full YouTube embed URL: https://www.youtube.com/embed/{video_id}
 )
 
 data class LessonCompleteRequest(
@@ -342,6 +343,16 @@ interface ApiService {
 
     @POST("api/learn/complete")
     suspend fun completeLesson(@Body request: LessonCompleteRequest): SimpleResponse
+
+    // --- Quiz Routes (for Learn Module) ---
+    @GET("api/learn/quiz/{videoId}")
+    suspend fun getQuiz(@Path("videoId") videoId: Int): Quiz
+
+    @POST("api/learn/quiz/submit")
+    suspend fun submitQuiz(@Body submission: QuizSubmission): QuizResult
+
+    @POST("api/learn/seed-v2")
+    suspend fun seedLearnV2(): SimpleResponse
 
     // --- Paper Trading Routes (All values in ₹) ---
     @GET("api/trade/portfolio")

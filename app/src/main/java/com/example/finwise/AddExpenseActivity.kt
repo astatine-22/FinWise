@@ -29,6 +29,7 @@ class AddExpenseActivity : AppCompatActivity() {
     private lateinit var btnSave: AppCompatButton
     private lateinit var btnBack: android.widget.ImageView
     private lateinit var tvHeaderTitle: TextView // Header title TextView
+    private lateinit var progressBar: android.widget.ProgressBar
     private var userEmail: String? = null
 
     private val selectedCalendar = Calendar.getInstance()
@@ -64,6 +65,26 @@ class AddExpenseActivity : AppCompatActivity() {
 
             setupEditMode(title, amount, category, dateString)
         }
+        // --- NEW: Check for SMS Auto-fill ---
+        else if (intent.hasExtra("EXTRA_AMOUNT")) {
+            val amountStr = intent.getStringExtra("EXTRA_AMOUNT")
+            val title = intent.getStringExtra("EXTRA_TITLE")
+            val category = intent.getStringExtra("EXTRA_CATEGORY")
+            
+            // Pre-fill amount
+            amountStr?.let { etAmount.setText(it) }
+            
+            // Pre-fill title/note
+            title?.let { etNote.setText(it) }
+            
+            // Pre-select category in spinner
+            category?.let { cat ->
+                val index = categories.indexOfFirst { it.equals(cat, ignoreCase = true) }
+                if (index != -1) {
+                    spinnerCategory.setSelection(index)
+                }
+            }
+        }
         // --------------------------------
 
         // Listeners
@@ -78,6 +99,7 @@ class AddExpenseActivity : AppCompatActivity() {
         etDate = findViewById(R.id.etDate)
         btnSave = findViewById(R.id.btnSave)
         btnBack = findViewById(R.id.btnBack)
+        progressBar = findViewById(R.id.progressBar)
         // Assuming you have a TextView with this ID in your layout for the header
         // If not, you might need to add it or find the correct ID.
         // Based on typical layouts, it's often named 'tvHeaderTitle' or similar.
@@ -214,8 +236,7 @@ class AddExpenseActivity : AppCompatActivity() {
             date = dateStringForBackend
         )
 
-        btnSave.isEnabled = false
-        btnSave.text = if (isEditMode) "Updating..." else "Saving..."
+        showLoadingState()
 
         if (isEditMode) {
             updateExpense(expenseIdToEdit, request)
@@ -231,13 +252,15 @@ class AddExpenseActivity : AppCompatActivity() {
             try {
                 RetrofitClient.instance.updateExpense(id, request)
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@AddExpenseActivity, "Expense updated!", Toast.LENGTH_SHORT).show()
-                    finish() // Close activity and return to Budget screen
+                    hideLoadingState()
+                    Toast.makeText(this@AddExpenseActivity, "Expense updated successfully!", Toast.LENGTH_SHORT).show()
+                    finish() // Close activity only after successful response
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@AddExpenseActivity, "Update failed: ${e.message}", Toast.LENGTH_SHORT).show()
-                    resetButtonState()
+                    hideLoadingState()
+                    Toast.makeText(this@AddExpenseActivity, "Update failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    // Don't finish - let user retry
                 }
             }
         }
@@ -250,19 +273,28 @@ class AddExpenseActivity : AppCompatActivity() {
             try {
                 val response = RetrofitClient.instance.addExpense(request)
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@AddExpenseActivity, response.message, Toast.LENGTH_SHORT).show()
-                    finish()
+                    hideLoadingState()
+                    Toast.makeText(this@AddExpenseActivity, "Saved successfully!", Toast.LENGTH_SHORT).show()
+                    finish() // Close activity only after successful response
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@AddExpenseActivity, "Failed to save: ${e.message}", Toast.LENGTH_SHORT).show()
-                    resetButtonState()
+                    hideLoadingState()
+                    Toast.makeText(this@AddExpenseActivity, "Failed to save: ${e.message}", Toast.LENGTH_LONG).show()
+                    // Don't finish - let user retry
                 }
             }
         }
     }
 
-    private fun resetButtonState() {
+    private fun showLoadingState() {
+        btnSave.isEnabled = false
+        btnSave.text = if (isEditMode) "Updating..." else "Saving..."
+        progressBar.visibility = android.view.View.VISIBLE
+    }
+
+    private fun hideLoadingState() {
+        progressBar.visibility = android.view.View.GONE
         btnSave.isEnabled = true
         btnSave.text = if (isEditMode) "Update Expense" else "Save Expense"
     }

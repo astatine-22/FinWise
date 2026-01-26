@@ -1,12 +1,21 @@
 package com.example.finwise
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
 import android.util.Base64
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.example.finwise.api.RetrofitClient
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -28,6 +37,20 @@ class MainActivity : AppCompatActivity() {
 
     // Screen titles for each tab
     private val screenTitles = listOf("Dashboard", "Budget", "Learn", "Trade")
+    
+    // SMS Permission Launcher
+    private val smsPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val receiveGranted = permissions[Manifest.permission.RECEIVE_SMS] ?: false
+        val readGranted = permissions[Manifest.permission.READ_SMS] ?: false
+        
+        if (receiveGranted && readGranted) {
+            Toast.makeText(this, "SMS permissions granted. Expense tracking enabled!", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "SMS permissions denied. Auto-expense tracking won't work.", Toast.LENGTH_LONG).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +72,26 @@ class MainActivity : AppCompatActivity() {
         setupFabClick(fabMainAdd)
         setupProfileClick()
         setupSearchClick()
+        
+        // Check and request SMS permissions
+        checkAndRequestSmsPermissions()
+        
+        createNotificationChannel()
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Expense Alerts"
+            val descriptionText = "Notifications for detected expenses"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel("finwise_expenses", name, importance).apply {
+                description = descriptionText
+            }
+            // Register the channel with the system
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 
     override fun onResume() {
@@ -164,6 +207,31 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 // Keep default icon on error
             }
+        }
+    }
+    
+    /**
+     * Check if SMS permissions are granted, and request them if not.
+     * This is required for automatic transaction detection from bank SMS.
+     */
+    private fun checkAndRequestSmsPermissions() {
+        val requiredPermissions = mutableListOf(
+            Manifest.permission.RECEIVE_SMS,
+            Manifest.permission.READ_SMS
+        )
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requiredPermissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
+        // Check if all permissions are already granted
+        val allGranted = requiredPermissions.all { permission ->
+            ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
+        }
+        
+        if (!allGranted) {
+            // Request SMS permissions
+            smsPermissionLauncher.launch(requiredPermissions.toTypedArray())
         }
     }
 }

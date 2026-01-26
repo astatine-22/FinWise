@@ -79,10 +79,11 @@ class ExpenseRepository(
             // 2. Map to Local Entities
             val localExpenses = expenseResponses.toLocalExpenses()
 
-            // 3. Insert into Database (triggers Flow update)
-            // Note: This replaces ensuring we have the latest server state.
-            // CAUTION: This might overwrite unsynced local changes if not careful.
-            // Phase 3 will handle complex sync conflicts. For Phase 2 (Read-only mostly), this is fine.
+            // 3. Clear existing SYNCED data to avoid stale duplicates
+            // We keep unsynced data (isSynced=false) to push later
+            expenseDao.deleteSyncedExpenses()
+
+            // 4. Insert new data from server
             if (localExpenses.isNotEmpty()) {
                 expenseDao.insertExpenses(localExpenses)
             }
@@ -91,6 +92,7 @@ class ExpenseRepository(
 
         } catch (e: Exception) {
             Log.e("ExpenseRepository", "Failed to refresh expenses", e)
+            throw e // Re-throw to let UI handle error state
         }
     }
     

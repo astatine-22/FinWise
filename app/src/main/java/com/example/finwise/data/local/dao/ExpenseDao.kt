@@ -56,6 +56,13 @@ interface ExpenseDao {
     suspend fun deleteAllExpenses()
 
     /**
+     * Delete only expenses that are already synced.
+     * Use this during refresh to remove stale data while keeping offline additions.
+     */
+    @Query("DELETE FROM expense_table WHERE isSynced = 1")
+    suspend fun deleteSyncedExpenses()
+
+    /**
      * Get total expense amount for a specific category.
      */
     @Query("SELECT SUM(amount) FROM expense_table WHERE category = :category")
