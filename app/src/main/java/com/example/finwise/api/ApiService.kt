@@ -455,6 +455,9 @@ interface ApiService {
 object RetrofitClient {
     // Production URL (Render cloud deployment)
     private const val BASE_URL = "https://finwise-api-z29q.onrender.com/"
+    
+    // Development URL (Android Emulator -> Localhost)
+    // private const val BASE_URL = "http://10.0.2.2:8000/"
 
     @Volatile
     private var apiService: ApiService? = null

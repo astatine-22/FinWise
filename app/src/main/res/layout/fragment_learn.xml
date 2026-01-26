@@ -1,55 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light">
+    android:orientation="vertical"
+    android:background="?android:attr/colorBackground">
 
-    <!-- Header -->
+    <!-- Header Section -->
     <LinearLayout
-        android:id="@+id/headerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="20dp"
-        android:background="@color/white"
-        android:elevation="4dp">
+        android:background="?attr/colorSurface"
+        android:elevation="4dp"
+        android:layout_marginBottom="8dp">
 
         <TextView
+            android:id="@+id/tvWelcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Learn to Earn"
-            android:textSize="24sp"
+            android:text="Welcome Back, Investor! 👋"
+            android:textColor="@color/text_title"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="@color/text_title" />
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Financial Education Videos"
-            android:textSize="14sp"
+            android:text="Continue your financial journey"
             android:textColor="@color/text_subtitle"
-            android:layout_marginTop="4dp" />
+            android:textSize="14sp"
+            android:layout_marginBottom="20dp" />
 
-        <!-- Quiz Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnTakeQuiz"
+        <!-- Progress Card -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="🎓 Take Finance Quiz"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/finwise_green"
-            android:layout_marginTop="16dp"
-            app:cornerRadius="12dp"/>
+            android:orientation="vertical"
+            android:background="@drawable/bg_progress_card"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Overall Course Progress"
+                    android:textColor="#1565C0"
+                    android:textStyle="bold"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="30%"
+                    android:textColor="#1565C0"
+                    android:textStyle="bold"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progressBarCourse"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:progress="30"
+                android:progressDrawable="@drawable/progress_rounded_blue" />
+            
+             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3 of 12 Lessons Completed"
+                android:textColor="#5472d3"
+                android:textSize="12sp"
+                android:layout_marginTop="8dp"/>
+
+        </LinearLayout>
     </LinearLayout>
 
-    <!-- Videos List -->
+    <!-- Course List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvVideos"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="100dp"
-        android:padding="16dp"
-        android:clipToPadding="false" />
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:clipToPadding="false"
+        tools:listitem="@layout/item_course_card" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>
