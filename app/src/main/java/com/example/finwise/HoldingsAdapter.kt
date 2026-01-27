@@ -11,7 +11,8 @@ import java.text.NumberFormat
 
 class HoldingsAdapter(
     private var holdings: List<HoldingResponse>,
-    private val rupeeFormat: NumberFormat
+    private val rupeeFormat: NumberFormat,
+    private val onItemClick: (HoldingResponse) -> Unit
 ) : RecyclerView.Adapter<HoldingsAdapter.HoldingViewHolder>() {
 
     class HoldingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -68,6 +69,11 @@ class HoldingsAdapter(
 
         holder.tvProfitLossPercent.text = " ($profitSign${String.format("%.2f", profitLossPercent)}%)"
         holder.tvProfitLossPercent.setTextColor(profitColor)
+
+        // Set click listener on root view
+        holder.itemView.setOnClickListener {
+            onItemClick(holding)
+        }
     }
 
     override fun getItemCount(): Int = holdings.size

@@ -5,5 +5,6 @@ data class Lesson(
     val title: String,
     val subtitle: String,
     val xp: String,
-    val videoUrl: String
+    val videoUrl: String,
+    val youtubeId: String = "" // Default for backward compatibility
 )

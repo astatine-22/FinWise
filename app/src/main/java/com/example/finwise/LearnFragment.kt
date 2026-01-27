@@ -60,7 +60,8 @@ class LearnFragment : Fragment() {
                         title = video.title,
                         subtitle = video.category,
                         xp = "50", // Placeholder XP or derived from backend if available
-                        videoUrl = video.embed_url ?: "https://www.youtube.com/embed/${video.youtube_video_id}"
+                        videoUrl = video.embed_url ?: "https://www.youtube.com/embed/${video.youtube_video_id}",
+                        youtubeId = video.youtube_video_id
                     )
                 }
 
@@ -84,6 +85,7 @@ class LearnFragment : Fragment() {
     private fun openLessonDetail(lesson: Lesson) {
         val intent = Intent(requireContext(), LessonDetailActivity::class.java).apply {
             putExtra("VIDEO_URL", lesson.videoUrl)
+            putExtra("YOUTUBE_ID", lesson.youtubeId)
             putExtra("VIDEO_ID", lesson.id) // Pass ID for Quiz
             putExtra("TITLE", lesson.title)
             putExtra("SUBTITLE", lesson.subtitle)

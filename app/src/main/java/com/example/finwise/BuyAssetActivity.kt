@@ -85,8 +85,14 @@ class BuyAssetActivity : AppCompatActivity() {
 
     // UI Components - Bottom
     private lateinit var tvEstimatedCost: TextView
+    private lateinit var tvExchangeRateInfo: TextView
     private lateinit var btnAction: MaterialButton
     private lateinit var loadingOverlay: FrameLayout
+
+    // UI Components - Holdings Card
+    private lateinit var cardUserHolding: com.google.android.material.card.MaterialCardView
+    private lateinit var tvHoldingValue: TextView
+    private lateinit var tvHoldingQuantity: TextView
 
     // State
     private var userEmail: String? = null
@@ -107,20 +113,43 @@ class BuyAssetActivity : AppCompatActivity() {
     private var searchRunnable: Runnable? = null
     private val SEARCH_DELAY_MS = 300L
 
-    // Rupee formatter
+    // Currency constants and formatters
+    private var usdToInrRate = 84.5f // Default fallback, will be updated from API
     private val rupeeFormat: NumberFormat = NumberFormat.getCurrencyInstance(Locale("en", "IN"))
+    private val dollarFormat: NumberFormat = NumberFormat.getCurrencyInstance(Locale.US)
+    
+    // Check if asset is USD-based (US stocks or crypto)
+    private val isUsdAsset: Boolean
+        get() = !isIndianStock
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_buy_asset)
 
         userEmail = intent.getStringExtra("USER_EMAIL")
-        val prefilledSymbol = intent.getStringExtra("PREFILLED_SYMBOL")
+        // Check for ASSET_SYMBOL (from portfolio) or PREFILLED_SYMBOL (from other screens)
+        val prefilledSymbol = intent.getStringExtra("ASSET_SYMBOL") 
+            ?: intent.getStringExtra("PREFILLED_SYMBOL")
+        val ownedQuantity = intent.getFloatExtra("OWNED_QUANTITY", 0f)
 
         initializeViews()
         setupChart()
         setupListeners()
         loadAvailableCash()
+        fetchLiveExchangeRate() // Fetch live USD to INR rate from API
+
+        // Display holdings card if user owns this stock
+        if (ownedQuantity > 0) {
+            val assetSymbol = intent.getStringExtra("ASSET_SYMBOL") ?: ""
+            val currentPrice = intent.getFloatExtra("CURRENT_PRICE", 0f)
+            val totalValue = ownedQuantity * currentPrice
+
+            cardUserHolding.visibility = View.VISIBLE
+            tvHoldingValue.text = rupeeFormat.format(totalValue)
+            tvHoldingQuantity.text = "${ownedQuantity.toInt()} Qty"
+        } else {
+            cardUserHolding.visibility = View.GONE
+        }
 
         // Pre-fill symbol if provided
         prefilledSymbol?.let { symbol ->
@@ -191,8 +220,14 @@ class BuyAssetActivity : AppCompatActivity() {
 
         // Bottom
         tvEstimatedCost = findViewById(R.id.tvEstimatedCost)
+        tvExchangeRateInfo = findViewById(R.id.tvExchangeRateInfo)
         btnAction = findViewById(R.id.btnAction)
         loadingOverlay = findViewById(R.id.loadingOverlay)
+
+        // Holdings Card
+        cardUserHolding = findViewById(R.id.cardUserHolding)
+        tvHoldingValue = findViewById(R.id.tvHoldingValue)
+        tvHoldingQuantity = findViewById(R.id.tvHoldingQuantity)
     }
 
     private fun setupChart() {
@@ -464,19 +499,22 @@ class BuyAssetActivity : AppCompatActivity() {
 
     private fun updatePriceDisplay(history: PriceHistoryResponse) {
         currentPrice = history.current_price
-        tvCurrentPrice.text = rupeeFormat.format(currentPrice)
+        
+        // Use appropriate currency formatter based on asset type
+        val priceFormatter = if (isUsdAsset) dollarFormat else rupeeFormat
+        tvCurrentPrice.text = priceFormatter.format(currentPrice)
         
         val changeSign = if (history.price_change >= 0) "+" else ""
-        tvPriceChange.text = "$changeSign${rupeeFormat.format(history.price_change)} ($changeSign${String.format("%.2f", history.price_change_percent)}%)"
+        tvPriceChange.text = "$changeSign${priceFormatter.format(history.price_change)} ($changeSign${String.format("%.2f", history.price_change_percent)}%)"
         
         // Day High/Low from price data
         if (history.data.isNotEmpty()) {
             val prices = history.data.map { it.price }
-            tvDayHigh.text = rupeeFormat.format(prices.maxOrNull() ?: currentPrice)
-            tvDayLow.text = rupeeFormat.format(prices.minOrNull() ?: currentPrice)
+            tvDayHigh.text = priceFormatter.format(prices.maxOrNull() ?: currentPrice)
+            tvDayLow.text = priceFormatter.format(prices.minOrNull() ?: currentPrice)
         }
         
-        tvMarketPriceHelper.text = "× Market Price ${rupeeFormat.format(currentPrice)}"
+        tvMarketPriceHelper.text = "× Market Price ${priceFormatter.format(currentPrice)}"
         
         calculateEstimatedCost()
     }
@@ -501,6 +539,25 @@ class BuyAssetActivity : AppCompatActivity() {
         
         priceChart.data = LineData(dataSet)
         priceChart.invalidate()
+    }
+
+    private fun fetchLiveExchangeRate() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Fetch crypto list which includes live USD to INR rate
+                val cryptoResponse = RetrofitClient.instance.getCryptoList()
+                val liveRate = cryptoResponse.usd_to_inr
+                
+                withContext(Dispatchers.Main) {
+                    usdToInrRate = liveRate
+                    // Recalculate cost if user has already entered a quantity
+                    calculateEstimatedCost()
+                }
+            } catch (e: Exception) {
+                // If API fails, keep using the default fallback rate (84.5)
+                android.util.Log.e("BuyAsset", "Failed to fetch live exchange rate: ${e.message}")
+            }
+        }
     }
 
     private fun loadAvailableCash() {
@@ -545,11 +602,26 @@ class BuyAssetActivity : AppCompatActivity() {
 
     private fun calculateEstimatedCost() {
         val quantity = etQuantity.text.toString().toFloatOrNull() ?: 0f
-        val cost = currentPrice * quantity
-        tvEstimatedCost.text = rupeeFormat.format(cost)
+        
+        // Calculate cost in INR (convert if USD asset)
+        val costInInr = if (isUsdAsset) {
+            currentPrice * quantity * usdToInrRate
+        } else {
+            currentPrice * quantity
+        }
+        
+        tvEstimatedCost.text = rupeeFormat.format(costInInr)
+        
+        // Show exchange rate info for USD assets
+        if (isUsdAsset && quantity > 0) {
+            tvExchangeRateInfo.visibility = View.VISIBLE
+            tvExchangeRateInfo.text = "Conv. Rate: ₹${String.format("%.2f", usdToInrRate)}/$ "
+        } else {
+            tvExchangeRateInfo.visibility = View.GONE
+        }
         
         btnAction.isEnabled = if (isBuyMode) {
-            quantity > 0 && cost <= availableCash && currentPrice > 0
+            quantity > 0 && costInInr <= availableCash && currentPrice > 0
         } else {
             quantity > 0 && quantity <= currentHoldings && currentPrice > 0
         }
@@ -565,8 +637,14 @@ class BuyAssetActivity : AppCompatActivity() {
         }
         
         if (isBuyMode) {
-            val cost = currentPrice * quantity
-            if (cost > availableCash) {
+            // Calculate total cost in INR (convert if USD asset)
+            val totalCostInInr = if (isUsdAsset) {
+                currentPrice * quantity * usdToInrRate
+            } else {
+                currentPrice * quantity
+            }
+            
+            if (totalCostInInr > availableCash) {
                 Toast.makeText(this, "Insufficient funds", Toast.LENGTH_SHORT).show()
                 return
             }

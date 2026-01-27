@@ -83,7 +83,17 @@ class PortfolioFragment : Fragment() {
     }
 
     private fun setupAdapter() {
-        holdingsAdapter = HoldingsAdapter(emptyList(), rupeeFormat)
+        holdingsAdapter = HoldingsAdapter(emptyList(), rupeeFormat) { holding ->
+            // When item clicked, open BuyAssetActivity with holding details
+            val intent = Intent(requireContext(), BuyAssetActivity::class.java).apply {
+                putExtra("USER_EMAIL", userEmail)
+                putExtra("ASSET_SYMBOL", holding.asset_symbol)
+                putExtra("ASSET_NAME", holding.asset_symbol.replace(".NS", "").replace(".BO", ""))
+                putExtra("CURRENT_PRICE", holding.current_value?.div(holding.quantity) ?: holding.average_buy_price)
+                putExtra("OWNED_QUANTITY", holding.quantity)
+            }
+            startActivity(intent)
+        }
         rvHoldings.layoutManager = LinearLayoutManager(context)
         rvHoldings.adapter = holdingsAdapter
     }
