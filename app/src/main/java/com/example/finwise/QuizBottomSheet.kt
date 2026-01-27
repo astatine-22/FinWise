@@ -17,9 +17,15 @@ class QuizBottomSheet : BottomSheetDialogFragment() {
 
     private lateinit var radioGroupOptions: RadioGroup
     private lateinit var rbOption1: RadioButton
+    private lateinit var rbOption2: RadioButton
+    private lateinit var rbOption3: RadioButton
+    private lateinit var rbOption4: RadioButton
     private lateinit var btnSubmitAnswer: Button
     private lateinit var cvSuccessOverlay: CardView
     private lateinit var btnClaimReward: Button
+    
+    // Store the correct answer option ("A", "B", "C", or "D")
+    private var correctAnswer: String = "A"
 
     // Interface to communicate with parent activity
     interface QuizCompletionListener {
@@ -30,6 +36,11 @@ class QuizBottomSheet : BottomSheetDialogFragment() {
 
     fun setQuizCompletionListener(listener: QuizCompletionListener) {
         this.listener = listener
+    }
+    
+    // Set the correct answer (call this before showing the bottom sheet)
+    fun setCorrectAnswer(answer: String) {
+        this.correctAnswer = answer.uppercase()
     }
 
     override fun onCreateView(
@@ -46,6 +57,9 @@ class QuizBottomSheet : BottomSheetDialogFragment() {
         // Initialize views
         radioGroupOptions = view.findViewById(R.id.radioGroupOptions)
         rbOption1 = view.findViewById(R.id.rbOption1)
+        rbOption2 = view.findViewById(R.id.rbOption2)
+        rbOption3 = view.findViewById(R.id.rbOption3)
+        rbOption4 = view.findViewById(R.id.rbOption4)
         btnSubmitAnswer = view.findViewById(R.id.btnSubmitAnswer)
         cvSuccessOverlay = view.findViewById(R.id.cvSuccessOverlay)
         btnClaimReward = view.findViewById(R.id.btnClaimReward)
@@ -72,8 +86,18 @@ class QuizBottomSheet : BottomSheetDialogFragment() {
             return
         }
 
-        // Check if the correct answer (Option 1) is selected
-        if (selectedId == R.id.rbOption1) {
+        // Map the selected radio button to its corresponding option letter
+        val selectedOption = when (selectedId) {
+            R.id.rbOption1 -> "A"
+            R.id.rbOption2 -> "B"
+            R.id.rbOption3 -> "C"
+            R.id.rbOption4 -> "D"
+
+            else -> ""
+        }
+
+        // Check if the selected option matches the correct answer
+        if (selectedOption == correctAnswer) {
             // Correct answer
             showSuccessOverlay()
             playSuccessSound()

@@ -1,25 +1,24 @@
 package com.example.finwise
 
-import android.content.res.ColorStateList
-import android.graphics.Color
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.ProgressBar
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import com.example.finwise.api.CheckAnswerRequest
 import com.example.finwise.api.ClaimBonusRequest
-import com.example.finwise.api.LessonCompleteRequest
+import com.example.finwise.api.Question
 import com.example.finwise.api.Quiz
 import com.example.finwise.api.RetrofitClient
-import com.example.finwise.api.SessionManager
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,87 +26,61 @@ import kotlinx.coroutines.withContext
 
 class LessonDetailActivity : AppCompatActivity() {
 
-    private lateinit var webView: WebView
+    private lateinit var webviewPlayer: WebView
     private lateinit var tvLessonTitle: TextView
     private lateinit var tvLessonDescription: TextView
-    private lateinit var btnMarkCompleted: Button
-
-    // Quiz Views
-    private lateinit var cardQuiz: androidx.cardview.widget.CardView
+    private lateinit var cardQuiz: CardView
     private lateinit var tvQuizHeader: TextView
     private lateinit var tvQuestionCounter: TextView
     private lateinit var tvQuestionText: TextView
-    private lateinit var radioGroupOptions: android.widget.RadioGroup
-    private lateinit var rbOptionA: android.widget.RadioButton
-    private lateinit var rbOptionB: android.widget.RadioButton
-    private lateinit var rbOptionC: android.widget.RadioButton
-    private lateinit var rbOptionD: android.widget.RadioButton
-    private lateinit var btnNextConfirm: Button
+    private lateinit var radioGroupOptions: RadioGroup
+    private lateinit var rbOptionA: RadioButton
+    private lateinit var rbOptionB: RadioButton
+    private lateinit var rbOptionC: RadioButton
+    private lateinit var rbOptionD: RadioButton
+    private lateinit var btnNextConfirm: MaterialButton
     private lateinit var progressQuiz: ProgressBar
     private lateinit var tvQuizError: TextView
+    private lateinit var btnMarkCompleted: Button
+    private lateinit var sharedPreferences: SharedPreferences
 
-    // State
-    private var quizQuestions: List<com.example.finwise.api.Question> = emptyList()
-    private var currentQuestionIndex = 0
-    private var isAnswerChecked = false
-    private var correctCount = 0
-    private var isVideoCompleted = false
-    private var videoId: Int = 0 // DB ID
-    private var quizId: Int = 0
-    private lateinit var sessionManager: SessionManager
+    private var lessonId: Int = 0
+    private var lessonTitle: String = ""
+    private var lessonSubtitle: String = ""
+    private var lessonXp: String = ""
+    private var lessonVideoUrl: String = ""
+    private var lessonYoutubeId: String = ""
+
+    private var quiz: Quiz? = null
+    private var currentQuestionIndex: Int = 0
+    private var userAnswers: MutableMap<String, String> = mutableMapOf()
+    private var totalXpEarned: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lesson_detail)
 
-        try {
-            // 1. Initialize Session
-            sessionManager = SessionManager.getInstance(this)
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
 
-            // 2. Initialize Views
-            initViews()
+        // Get data from intent
+        lessonId = intent.getIntExtra("LESSON_ID", 0)
+        lessonTitle = intent.getStringExtra("LESSON_TITLE") ?: ""
+        lessonSubtitle = intent.getStringExtra("LESSON_SUBTITLE") ?: ""
+        lessonXp = intent.getStringExtra("LESSON_XP") ?: ""
+        lessonVideoUrl = intent.getStringExtra("LESSON_VIDEO_URL") ?: ""
+        lessonYoutubeId = intent.getStringExtra("LESSON_YOUTUBE_ID") ?: ""
 
-            // 3. Get Data from Intent
-            val rawYoutubeId = intent.getStringExtra("YOUTUBE_ID") ?: ""
-            val title = intent.getStringExtra("TITLE") ?: "Lesson"
-            val subtitle = intent.getStringExtra("SUBTITLE") ?: ""
-            videoId = intent.getIntExtra("VIDEO_ID", 0)
-
-            Log.d("LessonDetail", "Received - YouTube URL: $rawYoutubeId, DB ID: $videoId")
-
-            // 4. Setup UI
-            tvLessonTitle.text = title
-            tvLessonDescription.text = subtitle
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-            // 5. Setup Video Player (using full YouTube URL from database)
-            if (rawYoutubeId.isNotEmpty()) {
-                Log.d("LessonDetail", "Loading video: $rawYoutubeId")
-                setupWebViewPlayer(rawYoutubeId)
-            } else {
-                Log.e("LessonDetail", "No YouTube URL provided")
-                Toast.makeText(this, "Error: No video URL", Toast.LENGTH_SHORT).show()
-            }
-
-            // 6. Initial Fetch
-            fetchQuiz()
-
-            // 7. Listeners
-            setupListeners()
-
-        } catch (e: Exception) {
-            Log.e("LessonDetail", "Error in onCreate", e)
-            Toast.makeText(this, "Error loading lesson", Toast.LENGTH_LONG).show()
-            finish()
-        }
+        initializeViews()
+        setupWebView()
+        displayLessonInfo()
+        fetchQuiz()
     }
 
-    private fun initViews() {
-        webView = findViewById(R.id.webview_player)
+    private fun initializeViews() {
+        webviewPlayer = findViewById(R.id.webview_player)
         tvLessonTitle = findViewById(R.id.tvLessonTitle)
         tvLessonDescription = findViewById(R.id.tvLessonDescription)
-        btnMarkCompleted = findViewById(R.id.btnMarkCompleted)
-
         cardQuiz = findViewById(R.id.cardQuiz)
         tvQuizHeader = findViewById(R.id.tvQuizHeader)
         tvQuestionCounter = findViewById(R.id.tvQuestionCounter)
@@ -120,325 +93,230 @@ class LessonDetailActivity : AppCompatActivity() {
         btnNextConfirm = findViewById(R.id.btnNextConfirm)
         progressQuiz = findViewById(R.id.progressQuiz)
         tvQuizError = findViewById(R.id.tvQuizError)
-    }
-
-    private fun setupListeners() {
-        btnMarkCompleted.setOnClickListener { claimXP() }
+        btnMarkCompleted = findViewById(R.id.btnMarkCompleted)
 
         btnNextConfirm.setOnClickListener {
-            if (isAnswerChecked) {
-                handleNextClick()
-            } else {
-                handleCheckAnswer()
-            }
+            handleCheckAnswer()
+        }
+
+        btnMarkCompleted.setOnClickListener {
+            claimXP(100)
         }
     }
 
-    private fun extractVideoId(url: String): String {
-        return try {
-            when {
-                url.contains("v=") -> url.substringAfter("v=").substringBefore("&")
-                url.contains("/embed/") -> url.substringAfter("/embed/").substringBefore("?")
-                url.contains("youtu.be/") -> url.substringAfter("youtu.be/").substringBefore("?")
-                else -> url // Assume raw ID
-            }
-        } catch (e: Exception) {
-            Log.e("LessonDetail", "Error extracting ID", e)
-            url
-        }
-    }
-
-    private fun setupWebViewPlayer(videoInput: String) {
-        // Configure WebView settings
-        webView.settings.apply {
-            javaScriptEnabled = true
-            domStorageEnabled = true
-            mediaPlaybackRequiresUserGesture = false
-            allowFileAccess = true
-            allowContentAccess = true
-            mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-            cacheMode = android.webkit.WebSettings.LOAD_DEFAULT
-            userAgentString = "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36"
-        }
-
-        // Add console logging
-        webView.webChromeClient = object : WebChromeClient() {
-            override fun onConsoleMessage(consoleMessage: android.webkit.ConsoleMessage?): Boolean {
-                consoleMessage?.let {
-                    Log.d("WebView", "Console: ${it.message()} -- Line: ${it.lineNumber()}")
-                }
-                return true
-            }
-        }
-
-        webView.webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView?, url: String?) {
-                super.onPageFinished(view, url)
-                Log.d("LessonDetail", "Page loaded: $url")
-            }
-
-            override fun onReceivedError(
-                view: WebView?,
-                request: android.webkit.WebResourceRequest?,
-                error: android.webkit.WebResourceError?
-            ) {
-                super.onReceivedError(view, request, error)
-                Log.e("LessonDetail", "WebView error: ${error?.description}")
-            }
-        }
-
-        // Check if videoInput is already a full URL or just an ID
-        val youtubeUrl = if (videoInput.startsWith("http")) {
-            videoInput // Already a full URL
-        } else {
-            "https://www.youtube.com/watch?v=$videoInput" // Build URL from ID
-        }
+    private fun setupWebView() {
+        // Enable JavaScript (required for YouTube)
+        webviewPlayer.settings.javaScriptEnabled = true
         
-        Log.d("LessonDetail", "Loading YouTube URL: $youtubeUrl")
-        webView.loadUrl(youtubeUrl)
+        // Enable DOM storage (required for YouTube player)
+        webviewPlayer.settings.domStorageEnabled = true
+        
+        // Enable media playback without user gesture
+        webviewPlayer.settings.mediaPlaybackRequiresUserGesture = false
+        
+        // Enable file access for web content
+        webviewPlayer.settings.allowFileAccess = true
+        webviewPlayer.settings.allowContentAccess = true
+        
+        // Enable zoom controls
+        webviewPlayer.settings.builtInZoomControls = true
+        webviewPlayer.settings.displayZoomControls = false
+        
+        // Load images automatically
+        webviewPlayer.settings.loadsImagesAutomatically = true
+        
+        // Enable viewport and load with overview mode for proper scaling
+        webviewPlayer.settings.useWideViewPort = true
+        webviewPlayer.settings.loadWithOverviewMode = true
+        
+        // Set WebViewClient to handle page loading
+        webviewPlayer.webViewClient = WebViewClient()
+
+        // Get the normal YouTube URL from database (no conversion needed)
+        val youtubeUrl = when {
+            lessonVideoUrl.isNotEmpty() -> lessonVideoUrl
+            lessonYoutubeId.isNotEmpty() -> "https://www.youtube.com/watch?v=$lessonYoutubeId"
+            else -> ""
+        }
+
+        // Load the normal YouTube URL directly
+        if (youtubeUrl.isNotEmpty()) {
+            webviewPlayer.loadUrl(youtubeUrl)
+        }
     }
 
-    // --- Quiz Logic ---
+    private fun displayLessonInfo() {
+        tvLessonTitle.text = lessonTitle
+        tvLessonDescription.text = lessonSubtitle
+    }
 
     private fun fetchQuiz() {
-        if (videoId == 0) {
-            showQuizError("Invalid Lesson ID", showFallbackButton = true)
-            return
-        }
-        showQuizLoading(true)
+        progressQuiz.visibility = View.VISIBLE
+        tvQuizError.visibility = View.GONE
+        cardQuiz.visibility = View.GONE
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val quiz: Quiz = RetrofitClient.instance.getQuiz(videoId)
+                val fetchedQuiz = RetrofitClient.instance.getQuiz(lessonId)
+                quiz = fetchedQuiz
+
                 withContext(Dispatchers.Main) {
-                    showQuizLoading(false)
-                    displayQuiz(quiz)
+                    progressQuiz.visibility = View.GONE
+                    if (fetchedQuiz.questions.isNotEmpty()) {
+                        cardQuiz.visibility = View.VISIBLE
+                        displayQuestion(0)
+                    } else {
+                        tvQuizError.visibility = View.VISIBLE
+                        tvQuizError.text = "No quiz available for this lesson"
+                        btnMarkCompleted.visibility = View.VISIBLE
+                    }
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    showQuizLoading(false)
-                    showQuizError("No quiz available for this lesson", showFallbackButton = true)
+                    progressQuiz.visibility = View.GONE
+                    tvQuizError.visibility = View.VISIBLE
+                    tvQuizError.text = "Failed to load quiz"
+                    btnMarkCompleted.visibility = View.VISIBLE
                 }
             }
         }
     }
 
-    private fun displayQuiz(quiz: Quiz) {
-        quizId = quiz.id
-        quizQuestions = quiz.questions
-        currentQuestionIndex = 0
-        correctCount = 0
-        isAnswerChecked = false
-
-        cardQuiz.visibility = View.VISIBLE
-        btnMarkCompleted.visibility = View.GONE
-
-        if (quizQuestions.isNotEmpty()) {
-            showQuestion(0)
-        } else {
-            showQuizError("No questions found", showFallbackButton = true)
+    private fun displayQuestion(index: Int) {
+        val questions = quiz?.questions ?: return
+        if (index >= questions.size) {
+            handleQuizCompletion()
+            return
         }
-    }
 
-    private fun showQuestion(index: Int) {
-        isAnswerChecked = false
-        val question = quizQuestions[index]
+        val question = questions[index]
+        currentQuestionIndex = index
 
-        tvQuestionCounter.text = "Question ${index + 1} of ${quizQuestions.size}"
+        tvQuestionCounter.text = "Question ${index + 1} of ${questions.size}"
         tvQuestionText.text = question.question_text
-
         rbOptionA.text = question.option_a
         rbOptionB.text = question.option_b
         rbOptionC.text = question.option_c
         rbOptionD.text = question.option_d
 
+        // Clear previous selection
         radioGroupOptions.clearCheck()
-        enableRadioButtons()
-        resetRadioButtonColors()
 
-        btnNextConfirm.text = "Check Answer"
-        btnNextConfirm.isEnabled = true
+        // Update button text
+        btnNextConfirm.text = if (index == questions.size - 1) "Submit" else "Next Question"
     }
 
     private fun handleCheckAnswer() {
         val selectedId = radioGroupOptions.checkedRadioButtonId
+
         if (selectedId == -1) {
-            Toast.makeText(this, "Please select an answer", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Please select an answer!", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val selectedRb = findViewById<android.widget.RadioButton>(selectedId)
-        val selectedOption = when (selectedRb) {
-            rbOptionA -> "A"
-            rbOptionB -> "B"
-            rbOptionC -> "C"
-            rbOptionD -> "D"
-            else -> "A"
+        val selectedOption = when (selectedId) {
+            R.id.rbOptionA -> "A"
+            R.id.rbOptionB -> "B"
+            R.id.rbOptionC -> "C"
+            R.id.rbOptionD -> "D"
+            else -> ""
         }
 
-        val currentQuestion = quizQuestions[currentQuestionIndex]
-        val userEmail = sessionManager.fetchUserEmail() ?: return
+        val currentQuestion = quiz?.questions?.get(currentQuestionIndex) ?: return
+        val questionId = currentQuestion.id
 
-        btnNextConfirm.isEnabled = false
-        btnNextConfirm.text = "Checking..."
+        // Store the user's answer
+        userAnswers[questionId.toString()] = selectedOption
+
+        // Check answer with backend
+        val email = sharedPreferences.getString("userEmail", "") ?: ""
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response = RetrofitClient.instance.checkAnswer(
-                    CheckAnswerRequest(userEmail, currentQuestion.id, selectedOption)
-                )
+                val request = CheckAnswerRequest(email, questionId, selectedOption)
+                val response = RetrofitClient.instance.checkAnswer(request)
 
                 withContext(Dispatchers.Main) {
-                    btnNextConfirm.isEnabled = true
-                    isAnswerChecked = true
-                    btnNextConfirm.text = "Next Question"
-
                     if (response.is_correct) {
-                        correctCount++
-                        setOptionColor(selectedRb, true)
-                        Toast.makeText(this@LessonDetailActivity, response.xp_message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@LessonDetailActivity,
+                            "Correct! ${response.xp_message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        totalXpEarned += currentQuestion.xp_value
                     } else {
-                        setOptionColor(selectedRb, false)
-                        highlightCorrectAnswer(response.correct_option)
-                        Toast.makeText(this@LessonDetailActivity, "Wrong Answer", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@LessonDetailActivity,
+                            "Wrong! Correct answer: ${response.correct_option}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-                    disableRadioButtons()
+
+                    // Move to next question after a short delay
+                    webviewPlayer.postDelayed({
+                        displayQuestion(currentQuestionIndex + 1)
+                    }, 1000)
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    btnNextConfirm.isEnabled = true
-                    btnNextConfirm.text = "Check Answer"
-                    Toast.makeText(this@LessonDetailActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@LessonDetailActivity,
+                        "Error checking answer",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    // Move to next question anyway
+                    displayQuestion(currentQuestionIndex + 1)
                 }
             }
-        }
-    }
-
-    private fun handleNextClick() {
-        if (currentQuestionIndex < quizQuestions.size - 1) {
-            currentQuestionIndex++
-            showQuestion(currentQuestionIndex)
-        } else {
-            handleQuizCompletion()
         }
     }
 
     private fun handleQuizCompletion() {
-        val totalQuestions = quizQuestions.size
-        val userEmail = sessionManager.fetchUserEmail() ?: return
-
-        if (correctCount == totalQuestions) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val bonusResponse = RetrofitClient.instance.claimBonus(
-                        ClaimBonusRequest(userEmail, quizId)
-                    )
-                    withContext(Dispatchers.Main) {
-                        showResultDialog(correctCount, totalQuestions, bonusResponse.xp_bonus, "🏆 Perfect Score! Bonus XP Awarded!")
-                    }
-                } catch (e: Exception) {
-                     withContext(Dispatchers.Main) {
-                        showResultDialog(correctCount, totalQuestions, 0, "Perfect score! (Bonus claim failed)")
-                     }
-                }
-            }
-        } else {
-            showResultDialog(correctCount, totalQuestions, 0, "Good effort! Keep learning.")
-        }
-    }
-
-    private fun claimXP() {
-        val email = sessionManager.fetchUserEmail() ?: return
-        btnMarkCompleted.isEnabled = false
-        btnMarkCompleted.text = "Claiming..."
+        cardQuiz.visibility = View.GONE
+        
+        val email = sharedPreferences.getString("userEmail", "") ?: ""
+        val quizId = quiz?.id ?: return
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                RetrofitClient.instance.completeLesson(LessonCompleteRequest(email, videoId))
+                val request = ClaimBonusRequest(email, quizId)
+                val response = RetrofitClient.instance.claimBonus(request)
+
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@LessonDetailActivity, "XP Earned!", Toast.LENGTH_SHORT).show()
+                    if (response.success) {
+                        totalXpEarned += response.xp_bonus
+                        Toast.makeText(
+                            this@LessonDetailActivity,
+                            "${response.message}\nTotal XP Earned: $totalXpEarned",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            this@LessonDetailActivity,
+                            response.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                     finish()
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    btnMarkCompleted.isEnabled = true
-                    btnMarkCompleted.text = "Mark as Completed"
+                    Toast.makeText(
+                        this@LessonDetailActivity,
+                        "Quiz completed! Total XP: $totalXpEarned",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    finish()
                 }
             }
         }
     }
 
-    // --- UI Helpers ---
-
-    private fun setOptionColor(rb: android.widget.RadioButton, isCorrect: Boolean) {
-        val color = if (isCorrect) Color.GREEN else Color.RED
-        rb.buttonTintList = ColorStateList.valueOf(color)
-        rb.setTextColor(color)
-    }
-
-    private fun highlightCorrectAnswer(correctOption: String) {
-        val correctRb = when (correctOption) {
-            "A" -> rbOptionA
-            "B" -> rbOptionB
-            "C" -> rbOptionC
-            "D" -> rbOptionD
-            else -> null
-        }
-        if (correctRb != null) setOptionColor(correctRb, true)
-    }
-
-    private fun resetRadioButtonColors() {
-        val color = tvQuestionText.textColors
-        listOf(rbOptionA, rbOptionB, rbOptionC, rbOptionD).forEach {
-            it.buttonTintList = null
-            it.setTextColor(color)
-        }
-    }
-
-    private fun enableRadioButtons() {
-        for (i in 0 until radioGroupOptions.childCount) {
-            radioGroupOptions.getChildAt(i).isEnabled = true
-        }
-    }
-
-    private fun disableRadioButtons() {
-        for (i in 0 until radioGroupOptions.childCount) {
-            radioGroupOptions.getChildAt(i).isEnabled = false
-        }
-    }
-
-    private fun showQuizLoading(show: Boolean) {
-        progressQuiz.visibility = if (show) View.VISIBLE else View.GONE
-        tvQuizError.visibility = View.GONE
-        if (show) cardQuiz.visibility = View.GONE
-    }
-
-    private fun showQuizError(message: String, showFallbackButton: Boolean = false) {
-        progressQuiz.visibility = View.GONE
-        tvQuizError.text = message
-        tvQuizError.visibility = View.VISIBLE
-        cardQuiz.visibility = View.GONE
-        
-        if (showFallbackButton) {
-            btnMarkCompleted.visibility = View.VISIBLE
-        }
-    }
-
-    private fun showResultDialog(correct: Int, total: Int, xp: Int, message: String) {
-        AlertDialog.Builder(this)
-            .setTitle("Quiz Results")
-            .setMessage("Score: $correct/$total\nXP Earned: $xp\n\n$message")
-            .setPositiveButton("Close") { _, _ -> finish() }
-            .setCancelable(false)
-            .show()
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
+    private fun claimXP(xp: Int) {
+        Toast.makeText(this, "Claimed $xp XP!", Toast.LENGTH_SHORT).show()
         finish()
-        return true
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        webView.destroy()
     }
 }

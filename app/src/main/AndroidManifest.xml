@@ -10,6 +10,9 @@
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Declare telephony feature as not required for Chrome OS compatibility -->
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -46,9 +49,6 @@
             android:exported="false" />
         <activity
             android:name=".QuizActivity"
-            android:exported="false" />
-        <activity
-            android:name=".BudgetActivity"
             android:exported="false" />
         <activity
             android:name=".SignupActivity"

@@ -71,6 +71,16 @@
             android:text="To impress friends"
             android:textColor="@color/text_subtitle"
             android:textSize="16sp" />
+
+        <RadioButton
+            android:id="@+id/rbOption4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/finwise_green"
+            android:padding="12dp"
+            android:text="To avoid taxes"
+            android:textColor="@color/text_subtitle"
+            android:textSize="16sp" />
     </RadioGroup>
 
     <!-- Submit Button -->

@@ -68,7 +68,7 @@ class EditProfileActivity : AppCompatActivity() {
         btnBack = findViewById(R.id.btnBack)
         btnSave = findViewById(R.id.btnSave)
         profileAvatarContainer = findViewById(R.id.profileAvatarContainer)
-        ivProfileAvatar = findViewById(R.id.ivProfileAvatar)
+        ivProfileAvatar = findViewById(R.id.ivProfileImage)
         etName = findViewById(R.id.etName)
         etEmail = findViewById(R.id.etEmail)
 
