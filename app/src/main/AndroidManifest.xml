@@ -33,6 +33,9 @@
             android:name=".LeaderboardActivity"
             android:exported="false" />
         <activity
+            android:name=".SavingsGoalsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ProfileActivity"
             android:exported="false" />
         <activity
@@ -46,7 +49,8 @@
             android:exported="false" />
         <activity
             android:name=".LessonDetailActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity
             android:name=".QuizActivity"
             android:exported="false" />

@@ -7,12 +7,14 @@
     android:layout_height="match_parent"
     android:background="?android:attr/colorBackground">
 
-    <!-- Video Player (WebView) -->
-    <WebView
-        android:id="@+id/webview_player"
+    <!-- ExoPlayer Video View -->
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/playerView"
         android:layout_width="match_parent"
-        android:layout_height="450dp"
-        android:layout_marginTop="24dp"
+        android:layout_height="240dp"
+        android:background="@android:color/black"
+        app:show_buffering="when_playing"
+        app:use_controller="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -22,189 +24,88 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintTop_toBottomOf="@id/webview_player"
+        app:layout_constraintTop_toBottomOf="@id/playerView"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="24dp">
+            android:padding="16dp">
 
-            <!-- Video Info Section -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="?attr/colorSurface"
-                android:padding="16dp"
-                android:elevation="2dp">
-
-                <TextView
-                    android:id="@+id/tvLessonTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    tools:text="Stock Market Basics"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:id="@+id/tvLessonDescription"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    tools:text="Learn the fundamentals of stock market investing"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
-                    android:lineSpacingExtra="4dp" />
-            </LinearLayout>
-
-            <!-- Quiz Container (Single Question View) -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardQuiz"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="?attr/colorSurface"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <!-- Quiz Header -->
-                    <TextView
-                        android:id="@+id/tvQuizHeader"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Quiz: Test Your Knowledge"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:layout_marginBottom="4dp" />
-
-                    <!-- Question Counter -->
-                    <TextView
-                        android:id="@+id/tvQuestionCounter"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Question 1 of 5"
-                        android:textSize="12sp"
-                        android:textColor="?android:attr/textColorSecondary"
-                        android:layout_marginBottom="16dp" />
-
-                    <!-- Divider -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#E0E0E0"
-                        android:layout_marginBottom="16dp" />
-
-                    <!-- Question Text -->
-                    <TextView
-                        android:id="@+id/tvQuestionText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="What implies a 'Bull Market'?"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:layout_marginBottom="16dp" />
-
-                    <!-- Options Radio Group -->
-                    <RadioGroup
-                        android:id="@+id/radioGroupOptions"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="24dp">
-
-                        <RadioButton
-                            android:id="@+id/rbOptionA"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Market is going down"
-                            android:textSize="14sp"
-                            android:paddingVertical="8dp" />
-
-                        <RadioButton
-                            android:id="@+id/rbOptionB"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Market is going up"
-                            android:textSize="14sp"
-                            android:paddingVertical="8dp" />
-
-                        <RadioButton
-                            android:id="@+id/rbOptionC"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Market is stagnant"
-                            android:textSize="14sp"
-                            android:paddingVertical="8dp" />
-
-                        <RadioButton
-                            android:id="@+id/rbOptionD"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="None of the above"
-                            android:textSize="14sp"
-                            android:paddingVertical="8dp" />
-                    </RadioGroup>
-
-                    <!-- Next Question / Confirm Button -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnNextConfirm"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:text="Next Question"
-                        android:textAllCaps="false"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="8dp"
-                        app:backgroundTint="@color/finwise_green" />
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Loading Indicator -->
-            <ProgressBar
-                android:id="@+id/progressQuiz"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="32dp"
-                android:visibility="gone" />
-
-            <!-- Error Message -->
+            <!-- Lesson Title -->
             <TextView
-                android:id="@+id/tvQuizError"
+                android:id="@+id/tvLessonTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:gravity="center"
-                android:text="Quiz loading..."
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="14sp"
-                android:visibility="gone" />
-
-            <!-- Mark as Completed Button (Fallback) -->
-            <Button
-                android:id="@+id/btnMarkCompleted"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:text="Mark as Completed (+100 XP)"
-                android:textColor="@color/white"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="22sp"
                 android:textStyle="bold"
+                android:layout_marginBottom="16dp"
+                tools:text="How does the stock market work?" />
+
+            <!-- About This Lesson Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="About this Lesson"
+                android:textColor="@color/finwise_green"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvLessonDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="15sp"
+                android:lineSpacingExtra="4dp"
+                android:layout_marginBottom="24dp"
+                tools:text="Learn about the history of the Dutch East India Company and how modern stock markets function today." />
+
+            <!-- Key Learnings Section -->
+            <TextView
+                android:id="@+id/tvKeyLearningsHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Key Learnings"
+                android:textColor="@color/finwise_green"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvKeyLearnings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="15sp"
+                android:lineSpacingExtra="4dp"
+                android:layout_marginBottom="32dp"
+                tools:text="• How companies raise capital\n• Role of stock exchanges\n• Why stock prices fluctuate" />
+
+            <!-- Take Quiz Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTakeQuiz"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Take Quiz"
+                android:textAllCaps="false"
                 android:textSize="16sp"
-                android:background="@drawable/bg_button_invest_now"
-                android:visibility="gone" />
+                android:textStyle="bold"
+                app:icon="@drawable/ic_assignment"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:cornerRadius="12dp"
+                app:backgroundTint="@color/finwise_green" />
+
+            <!-- Spacer for bottom padding -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="24dp" />
 
         </LinearLayout>
     </ScrollView>

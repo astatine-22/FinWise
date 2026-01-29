@@ -111,7 +111,7 @@ class DashboardFragment : Fragment() {
         }
 
         cardSavingsGoals.setOnClickListener {
-            Toast.makeText(requireContext(), "Savings Goals coming soon!", Toast.LENGTH_SHORT).show()
+            startActivity(android.content.Intent(requireContext(), SavingsGoalsActivity::class.java))
         }
 
         // Hall of Fame - Open LeaderboardActivity
@@ -126,6 +126,27 @@ class DashboardFragment : Fragment() {
         // This ensures XP updates from completing lessons are shown immediately
         userEmail?.let { email ->
             fetchGamificationData(email)
+            checkInUser(email)  // Update daily streak
+        }
+    }
+
+    /**
+     * Check in the user to update their daily streak.
+     * Called automatically when the dashboard becomes visible.
+     */
+    private fun checkInUser(email: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitClient.instance.checkIn(email)
+                // Update the streak display
+                withContext(Dispatchers.Main) {
+                    if (isAdded) {
+                        tvStreak.text = response.streak.toString()
+                    }
+                }
+            } catch (e: Exception) {
+                // Silently fail - streak update is not critical
+            }
         }
     }
 

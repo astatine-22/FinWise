@@ -276,6 +276,36 @@ data class LeaderboardResponse(
 )
 
 // ============================================================================
+// SAVINGS GOALS & DAILY STREAK MODELS
+// ============================================================================
+
+data class CheckInResponse(
+    val streak: Int,
+    val message: String
+)
+
+data class SavingsGoalResponse(
+    val id: Int,
+    val title: String,
+    val target_amount: Float,
+    val current_amount: Float,
+    val deadline: String?,  // ISO date string (YYYY-MM-DD)
+    val icon_name: String,
+    val progress_percent: Int
+)
+
+data class CreateGoalRequest(
+    val email: String,
+    val title: String,
+    val target_amount: Float,
+    val deadline: String? = null  // ISO date string (YYYY-MM-DD)
+)
+
+data class DepositRequest(
+    val amount: Float
+)
+
+// ============================================================================
 // API INTERFACE
 // ============================================================================
 
@@ -452,6 +482,22 @@ interface ApiService {
 
     @GET("api/market/stocks/in")
     suspend fun getIndianStocks(): StockListResponse
+
+    // --- Savings Goals & Daily Streak ---
+    @POST("api/user/check-in")
+    suspend fun checkIn(@Query("email") email: String): CheckInResponse
+
+    @GET("api/goals/{email}")
+    suspend fun getSavingsGoals(@Path("email") email: String): List<SavingsGoalResponse>
+
+    @POST("api/goals")
+    suspend fun createGoal(@Body request: CreateGoalRequest): SavingsGoalResponse
+
+    @PUT("api/goals/{goal_id}/deposit")
+    suspend fun depositToGoal(
+        @Path("goal_id") goalId: Int,
+        @Body request: DepositRequest
+    ): SavingsGoalResponse
 }
 
 // ============================================================================

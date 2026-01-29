@@ -78,4 +78,9 @@
     <color name="hall_of_fame_bg">#FFF8E1</color>
     <color name="hall_of_fame_text">#FF6F00</color>
     <color name="hall_of_fame_subtitle">#FFA000</color>
+    
+    <!-- Fix: Missing colors for Savings Goals -->
+    <color name="background_dark">#121212</color>
+    <color name="card_background">#1E1E1E</color>
+    <color name="text_secondary">#B0B0B0</color>
 </resources>
