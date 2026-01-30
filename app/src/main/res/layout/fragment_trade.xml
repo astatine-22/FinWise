@@ -78,7 +78,7 @@
         android:id="@+id/loadingOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#80FFFFFF"
+        android:background="@color/loading_overlay_color"
         android:visibility="gone"
         android:clickable="true"
         android:focusable="true">

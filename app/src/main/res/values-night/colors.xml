@@ -102,4 +102,7 @@
     <color name="hall_of_fame_bg">#263238</color>
     <color name="hall_of_fame_text">#FFB74D</color>
     <color name="hall_of_fame_subtitle">#FFE0B2</color>
+    
+    <color name="loading_overlay_color">#80000000</color>
+    <color name="surface_variant">#1E1E1E</color>
 </resources>

@@ -81,6 +81,8 @@
     
     <!-- Fix: Missing colors for Savings Goals -->
     <color name="background_dark">#121212</color>
-    <color name="card_background">#1E1E1E</color>
-    <color name="text_secondary">#B0B0B0</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="text_secondary">#757575</color>
+    <color name="loading_overlay_color">#80000000</color>
+    <color name="surface_variant">#F5F5F5</color>
 </resources>

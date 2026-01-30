@@ -18,7 +18,7 @@
         android:text="Spending Breakdown"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="#333333"
+        android:textColor="@color/text_title"
         android:layout_marginBottom="16dp"/>
 
     <androidx.recyclerview.widget.RecyclerView

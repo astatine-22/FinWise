@@ -86,7 +86,7 @@
                     android:layout_weight="1"
                     android:text="MODULE 1 • BASICS"
                     android:textAllCaps="true"
-                    android:textColor="#757575"
+                    android:textColor="@color/text_subtitle"
                     android:textSize="11sp"
                     android:textStyle="bold"
                     android:letterSpacing="0.05" />

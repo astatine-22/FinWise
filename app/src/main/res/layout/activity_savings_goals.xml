@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_dark">
+    android:fitsSystemWindows="true"
+    android:background="@color/background_light">
 
     <!-- App Bar -->
     <com.google.android.material.appbar.AppBarLayout
@@ -17,9 +18,9 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/background_dark"
+            android:background="@color/background_light"
             app:title="Savings Goals"
-            app:titleTextColor="@android:color/white"
+            app:titleTextColor="@color/text_title"
             app:navigationIcon="?attr/homeAsUpIndicator" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -58,7 +59,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="No Savings Goals Yet"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/text_title"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp" />
