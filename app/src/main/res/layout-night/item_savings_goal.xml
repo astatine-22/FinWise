@@ -43,7 +43,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Emergency Fund"
-                    android:textColor="#1B5E20"
+                    android:textColor="@android:color/white"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -52,7 +52,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Target: Dec 2026"
-                    android:textColor="#2E7D32"
+                    android:textColor="#E0E0E0"
                     android:textSize="12sp"
                     android:layout_marginTop="2dp" />
 
@@ -84,7 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="₹30,000"
-                android:textColor="#1B5E20"
+                android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -93,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="/ ₹50,000"
-                android:textColor="#2E7D32"
+                android:textColor="#E0E0E0"
                 android:textSize="14sp" />
 
             <TextView
@@ -101,7 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="(60%)"
-                android:textColor="#1B5E20"
+                android:textColor="@android:color/white"
                 android:textSize="12sp"
                 android:layout_marginStart="8dp" />
 
@@ -113,8 +113,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Deposit Funds"
-            android:textColor="@android:color/white"
-            app:backgroundTint="#2E7D32"
+            android:textColor="#1B5E20"
+            app:backgroundTint="@android:color/white"
             app:cornerRadius="8dp"
             android:layout_marginTop="12dp" />
 

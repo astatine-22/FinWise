@@ -27,9 +27,10 @@ class SavingsGoalsActivity : AppCompatActivity() {
     private lateinit var adapter: SavingsGoalAdapter
     private var goals: List<SavingsGoalResponse> = emptyList()
     
+    
     private val userEmail: String by lazy {
-        getSharedPreferences("UserPrefs", MODE_PRIVATE)
-            .getString("user_email", "") ?: ""
+        getSharedPreferences("FinWisePrefs", MODE_PRIVATE)
+            .getString("LOGGED_IN_EMAIL", "") ?: ""
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
