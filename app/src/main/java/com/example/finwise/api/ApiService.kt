@@ -91,6 +91,12 @@ data class LessonCompleteRequest(
     val video_id: Int
 )
 
+// Request for awarding variable XP (e.g. quiz: 10 XP per correct answer)
+data class AwardXpRequest(
+    val email: String,
+    val xp: Int
+)
+
 // ============================================================================
 // PAPER TRADING MODELS (All values in Indian Rupees ₹)
 // ============================================================================
@@ -373,6 +379,9 @@ interface ApiService {
 
     @POST("api/learn/complete")
     suspend fun completeLesson(@Body request: LessonCompleteRequest): SimpleResponse
+
+    @POST("api/user/award-xp")
+    suspend fun awardXp(@Body request: AwardXpRequest): SimpleResponse
 
     // --- Quiz Routes (for Learn Module) ---
     @GET("api/learn/quiz/{videoId}")

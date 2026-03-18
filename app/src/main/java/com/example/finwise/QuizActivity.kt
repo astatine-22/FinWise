@@ -9,6 +9,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.finwise.api.AwardXpRequest
 import com.example.finwise.api.LessonCompleteRequest
 import com.example.finwise.api.RetrofitClient
 import com.google.android.material.button.MaterialButton
@@ -384,7 +385,7 @@ class QuizActivity : AppCompatActivity() {
 
     private fun showResults() {
         val percentage = (score * 100) / questions.size
-        val xpEarned = if (percentage >= 60) 100 else 10
+        val xpEarned = score * 10  // 10 XP per correct answer
 
         val resultMessage = """
             Quiz Completed! 🎉
@@ -410,30 +411,27 @@ class QuizActivity : AppCompatActivity() {
     }
 
     /**
-     * Syncs XP to the backend by calling POST /api/learn/complete with the lessonId.
-     * The backend uses UserVideoProgress to ensure XP is awarded only once per lesson.
+     * Syncs XP to the backend using POST /api/user/award-xp.
+     * Awards exactly 10 XP per correct answer (score * 10).
      */
     private fun syncXP() {
         val sharedPrefFinWise = getSharedPreferences("FinWisePrefs", Context.MODE_PRIVATE)
         val email = sharedPrefFinWise.getString("LOGGED_IN_EMAIL", null) ?: run {
-            // Fallback: try MyAppPrefs
             val altPrefs = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
             altPrefs.getString("userEmail", null)
         } ?: return
 
-        if (lessonId <= 0) {
-            Log.w("QuizActivity", "lessonId is 0 — cannot sync XP without a valid lesson ID")
-            return
-        }
+        val xpToAward = score * 10
+        if (xpToAward <= 0) return
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response = RetrofitClient.instance.completeLesson(
-                    LessonCompleteRequest(email = email, video_id = lessonId)
+                RetrofitClient.instance.awardXp(
+                    AwardXpRequest(email = email, xp = xpToAward)
                 )
-                Log.d("QuizActivity", "XP sync response: ${response.message}")
+                Log.d("QuizActivity", "Quiz XP synced: +$xpToAward XP")
             } catch (e: Exception) {
-                Log.e("QuizActivity", "XP sync failed: ${e.message}")
+                Log.e("QuizActivity", "Quiz XP sync failed: ${e.message}")
             }
         }
     }
